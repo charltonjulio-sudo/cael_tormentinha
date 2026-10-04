@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="fada">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grimório · Cael</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700;800&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--serif:'Alegreya',Georgia,serif;--sans:'Alegreya Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--title:'Cinzel Decorative',Georgia,serif;--r:12px;--r2:8px}
+/* Fada: violeta + magenta (análogas), verde-menta como complementar para o divino */
+[data-theme="fada"]{--bg:#120f1a;--surface:#1c1727;--surface2:#262036;--border:#4a4063;--text:#eee8f7;--text2:#c4b9d6;--muted:#a196b6;--accent:#c3a6ff;--accent2:#f2a7cf;--on-accent:#1a1028;
+ --pv:#ff8fa3;--campo:#7fd8e6;--pma:#8fb4ff;--pmd:#8fdca8;--pa:#f5cf72;--danger:#ff7a7a;
+ --sch-fogo:#ff9a62;--sch-def:#8fb4ff;--sch-ilusao:#e39bf0;--sch-natureza:#8fdca8;--sch-util:#c2d39f;--sch-sprite:#c3a6ff;--shadow:0 20px 60px rgba(0,0,0,.55);color-scheme:dark}
+/* Chamas: laranja + âmbar (análogas), azul como complementar para o arcano */
+[data-theme="chamas"]{--bg:#15100c;--surface:#201812;--surface2:#2b2018;--border:#5a4430;--text:#f5ece2;--text2:#d6c2ae;--muted:#ae9984;--accent:#ffa45c;--accent2:#ffd166;--on-accent:#1e1208;
+ --pv:#ff8a7a;--campo:#7fd3e0;--pma:#93b5ff;--pmd:#9bd98f;--pa:#ffd166;--danger:#ff7b6b;
+ --sch-fogo:#ff8a4c;--sch-def:#93b5ff;--sch-ilusao:#e2a0e6;--sch-natureza:#9bd98f;--sch-util:#cfc690;--sch-sprite:#d0b3ff;--shadow:0 20px 60px rgba(0,0,0,.6);color-scheme:dark}
+/* Pergaminho: tema claro para ambientes iluminados */
+[data-theme="pergaminho"]{--bg:#efe6d3;--surface:#faf5ea;--surface2:#f1e7d4;--border:#a8916a;--text:#2b2118;--text2:#4f3f2e;--muted:#6a5843;--accent:#6b3aa8;--accent2:#9c3d2a;--on-accent:#ffffff;
+ --pv:#a8213a;--campo:#1b6573;--pma:#2a4fa8;--pmd:#2b7041;--pa:#7d5800;--danger:#ad2318;
+ --sch-fogo:#a8411a;--sch-def:#2a4fa8;--sch-ilusao:#86358f;--sch-natureza:#2b7041;--sch-util:#566428;--sch-sprite:#6b3aa8;--shadow:0 20px 50px rgba(60,40,10,.25);color-scheme:light}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:17px}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.locked{overflow:hidden}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+strong{font-weight:700}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.3}
+[data-theme="pergaminho"] #fx{display:none}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── Cabeçalho ── */
+.hdr{display:flex;align-items:center;gap:1rem 1.5rem;padding:.9rem 1.5rem;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.hdr-id{flex:1;min-width:240px}
+.hdr-name{font-family:var(--title);font-size:1.9rem;color:var(--accent);line-height:1.1}
+.hdr-sub{font-size:.95rem;color:var(--text2)}
+.hdr-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.seg button{background:none;border:0;padding:.45rem .85rem;cursor:pointer;color:var(--text2);font-size:.92rem;min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:700}
+.btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:.45rem .9rem;cursor:pointer;font-size:.95rem;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:40px;color:var(--text);transition:border-color .15s,background .15s}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:800}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{min-height:34px;padding:.25rem .6rem;font-size:.9rem;min-width:40px}
+.save-flag{font-size:.82rem;color:var(--muted);white-space:nowrap}
+.save-flag.err{color:var(--danger);font-weight:700}
+
+/* ── Recursos ── */
+.res{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.75rem;padding:.9rem 1.5rem;border-bottom:1px solid var(--border)}
+.rc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.7rem .85rem .75rem;--c:var(--text)}
+.rc-top{display:flex;justify-content:space-between;align-items:center;gap:.4rem}
+.rc-label{font-size:.82rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
+.rc-label span{color:var(--c)}
+.rc-hint{font-size:.8rem;color:var(--muted)}
+.rc-val{font-size:2.1rem;font-weight:800;color:var(--c);font-variant-numeric:tabular-nums;line-height:1.15}
+.rc-max{font-size:1rem;color:var(--muted);font-weight:500}
+.bar{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;margin:.35rem 0 .55rem}
+.bar i{display:block;height:100%;width:0;background:var(--c);transition:width .3s}
+.rc-btns{display:flex;gap:.3rem;flex-wrap:wrap}
+.rc.r-pv{--c:var(--pv)}.rc.r-campo{--c:var(--campo)}.rc.r-pma{--c:var(--pma)}.rc.r-pmd{--c:var(--pmd)}.rc.r-pa{--c:var(--pa)}
+.rc.low{--c:var(--danger)}
+
+/* ── Estatísticas de combate ── */
+.hud{position:sticky;top:0;z-index:30;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.stats-bar{display:flex;flex-wrap:wrap;gap:.35rem .45rem;padding:.5rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface)}
+.st{font-size:.93rem;color:var(--text2);background:var(--surface2);border-radius:99px;padding:.18rem .7rem}
+.st b{color:var(--text);font-weight:800;font-variant-numeric:tabular-nums}
+.st.hot b{color:var(--sch-fogo)}
+.st.boost b{color:var(--accent)}
+.st.debuff b{color:var(--danger)}
+.tile.debuff{border-color:var(--danger)}.tile.debuff dd{color:var(--danger)}
+.conds{display:flex;flex-wrap:wrap;gap:.3rem}
+.cchip{border:1px solid var(--border);background:var(--surface2);border-radius:99px;padding:.2rem .65rem;font-size:.9rem;cursor:pointer;min-height:34px;color:var(--text)}
+.cchip:hover{border-color:var(--danger)}
+.cchip[aria-pressed="true"]{background:var(--danger);border-color:var(--danger);color:var(--bg);font-weight:700}
+.cchip.implied{border:1px dashed var(--danger);color:var(--danger)}
+.cond-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem 1.2rem;padding:.4rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface)}
+.cond-bar.on{background:color-mix(in srgb,var(--danger) 10%,var(--surface))}
+.cond-title{font-size:.8rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.cond-bar.on .cond-title{color:var(--danger)}
+.cgroup{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem}
+.cgroup .cond-who{color:var(--text2)}
+.cgroup.on .cond-who{color:var(--danger)}
+.cadd{width:30px;height:30px;border-radius:50%;border:1px dashed var(--border);background:var(--surface2);cursor:pointer;font-weight:800;color:var(--text2)}
+.cadd:hover{border-color:var(--danger);color:var(--danger)}
+.cact{font-size:.85rem;font-weight:700;color:var(--danger)}
+.cp-n{background:none;border:0;cursor:pointer;color:inherit;font:inherit;font-weight:inherit;padding:0;white-space:nowrap;display:inline-flex;align-items:center;gap:.25rem;min-height:26px}
+.cpill{white-space:nowrap}
+.cpop{position:fixed;z-index:75;width:min(460px,calc(100vw - 16px));max-height:min(70vh,560px);overflow-y:auto;background:var(--surface);border:1px solid var(--danger);border-radius:var(--r);box-shadow:var(--shadow);padding:.85rem .95rem 1rem}
+.cpop[hidden]{display:none}
+.cpop-h{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.6rem}
+.cpop-h h3{font-family:var(--serif);font-size:1.2rem}
+.cpop-hint{font-size:.86rem;color:var(--muted);margin:.5rem 0 0}
+.pet-cond-btn{margin:.1rem 0 .3rem}
+.cond-box{margin-top:.5rem}
+.cond-row{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+.cond-who{font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--danger);margin-right:.2rem}
+.cpill{display:inline-flex;align-items:center;gap:.2rem;border:1.5px solid var(--danger);color:var(--danger);border-radius:99px;padding:.1rem .25rem .1rem .7rem;font-weight:700;font-size:.92rem;background:var(--surface)}
+.cpill.implied{border-style:dashed;font-weight:500;padding-right:.7rem}
+.cpill > button:not(.cp-n){background:none;border:0;cursor:pointer;color:inherit;width:26px;height:26px;border-radius:50%;font-size:1rem;line-height:1}
+.cpill > button:not(.cp-n):hover{background:color-mix(in srgb,var(--danger) 20%,transparent)}
+.cflags{font-size:.97rem;color:var(--text);margin-top:.4rem;line-height:1.5}
+.cflags strong{color:var(--danger)}
+.cond-rules{margin-top:.35rem;font-size:.95rem}
+.cond-rules summary{cursor:pointer;color:var(--text2);font-weight:700;min-height:32px;display:flex;align-items:center}
+.cond-rules dt{font-weight:800;margin-top:.45rem;color:var(--text)}
+.cond-rules dd{color:var(--text2);line-height:1.5}
+.cond-act{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.45rem}
+.mdl-warn{flex-basis:100%;font-size:.95rem;color:var(--danger);font-weight:700}
+
+/* ── Abas ── */
+.tabs{display:flex;gap:.25rem;overflow-x:auto;padding:.5rem 1.5rem 0;border-bottom:1px solid var(--border);scrollbar-width:thin;background:var(--bg)}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:.6rem .9rem;cursor:pointer;color:var(--text2);font-size:.98rem;font-weight:700;white-space:nowrap;display:flex;gap:.4rem;align-items:center}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{color:var(--tc,var(--accent));border-bottom-color:var(--tc,var(--accent))}
+.tab-sep{width:1px;background:var(--border);margin:.5rem .35rem}
+
+/* ── Layout principal ── */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 320px;flex:1;align-items:start}
+.content{padding:1.25rem 1.5rem 4rem;min-width:0}
+.ph{margin-bottom:1rem}
+.ph h2{font-family:var(--serif);font-size:1.6rem;color:var(--tc,var(--text));line-height:1.2}
+.ph p{color:var(--text2);max-width:80ch;font-size:1rem;margin-top:.2rem}
+.sec{font-size:.85rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin:1.4rem 0 .6rem;display:flex;align-items:center;gap:.6rem}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Cards compactos ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.7rem}
+.card{display:flex;align-items:center;gap:.8rem;text-align:left;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--sc);border-radius:var(--r);padding:.75rem .9rem;cursor:pointer;width:100%;min-height:74px;transition:background .15s,transform .15s}
+.card:hover{background:var(--surface2);transform:translateY(-1px)}
+.card-ico{font-size:1.35rem;width:2.4rem;height:2.4rem;flex-shrink:0;display:grid;place-items:center;border-radius:50%;background:color-mix(in srgb,var(--sc) 20%,transparent)}
+.card-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.card-name{font-family:var(--serif);font-weight:700;font-size:1.14rem;color:var(--text);line-height:1.25}
+.star{color:var(--accent2)}
+.card-meta{font-size:.9rem;color:var(--text2)}
+.card-dmg{font-size:.9rem;color:var(--sc);font-weight:700}
+.pm{font-weight:800;font-size:.92rem;white-space:nowrap;padding:.12rem .6rem;border-radius:99px;border:1.5px solid currentColor;flex-shrink:0}
+.pm-arc{color:var(--pma)}.pm-div{color:var(--pmd)}
+.card.off{opacity:.72}
+
+/* ── Painéis de texto (talentos, combos, companheiros, itens) ── */
+.panels{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:.9rem;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.panel-h{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);background:var(--surface2)}
+.panel-h h3{font-family:var(--serif);font-size:1.2rem;line-height:1.25}
+.chip{font-size:.82rem;font-weight:700;padding:.12rem .55rem;border-radius:99px;border:1px solid var(--border);color:var(--text2);white-space:nowrap}
+.chip.cost{color:var(--pma);border-color:currentColor}
+.panel-b{padding:.85rem 1rem;font-size:1rem;line-height:1.6}
+.panel-b p+p{margin-top:.5rem}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:.25rem .9rem;margin:.6rem 0}
+.kv dt{color:var(--muted);font-weight:700;font-size:.9rem}
+.kv dd{color:var(--text)}
+.steps{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:.5rem}
+.steps li{counter-increment:s;display:flex;gap:.6rem}
+.steps li::before{content:counter(s);flex-shrink:0;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:800;font-size:.85rem;margin-top:.1rem}
+.result{margin-top:.75rem;padding:.6rem .8rem;border-left:4px solid var(--accent);background:var(--surface2);border-radius:0 var(--r2) var(--r2) 0}
+.note{margin-top:.6rem;color:var(--text2);font-style:italic;font-size:.95rem}
+.mini-tbl{width:100%;border-collapse:collapse;margin-top:.5rem;font-size:.95rem}
+.mini-tbl td,.mini-tbl th{border-bottom:1px solid var(--border);padding:.35rem .4rem;text-align:left}
+.mini-tbl th{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.mini-tbl td:last-child{font-weight:700;text-align:right}
+.skill-list{display:grid;grid-template-columns:1fr auto;gap:.1rem 1rem}
+.skill-list div{padding:.4rem 0;border-bottom:1px solid var(--border)}
+.skill-list .sv{font-weight:800;font-size:1.1rem;text-align:right;font-variant-numeric:tabular-nums;color:var(--accent)}
+.skill-list small{display:block;color:var(--muted);font-size:.85rem}
+.mini-res{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;padding-top:.7rem;border-top:1px solid var(--border)}
+.mini-res b{font-size:1.4rem;font-variant-numeric:tabular-nums;color:var(--pv)}
+
+/* ── Ficha de animal ── */
+.pets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:1rem;align-items:start}
+.pet .panel-h{flex-wrap:wrap}
+.pet-sub{font-size:.92rem;color:var(--text2);width:100%}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:.45rem;margin-bottom:.9rem}
+.tile{background:var(--surface2);border:1px solid transparent;border-radius:var(--r2);padding:.45rem .6rem;text-align:center}
+.tile dt{font-size:.74rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile dd{font-size:1.45rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+.tile dd small{font-size:.8rem;font-weight:500;color:var(--muted)}
+.tile.boost{border-color:var(--accent)}.tile.boost dd{color:var(--accent)}
+.attrs{display:grid;grid-template-columns:repeat(6,1fr);gap:.35rem;margin-bottom:.9rem}
+.attr{text-align:center;border:1px solid var(--border);border-radius:var(--r2);padding:.3rem 0}
+.attr b{display:block;font-size:.74rem;letter-spacing:.06em;color:var(--muted)}
+.attr span{font-size:1.15rem;font-weight:800}.attr small{display:block;font-size:.82rem;color:var(--text2)}
+.atk{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;padding:.6rem 0;border-top:1px solid var(--border)}
+.atk-n{font-weight:700;font-size:1.05rem;flex:1;min-width:150px}
+.atk-n small{display:block;font-weight:400;color:var(--text2);font-size:.9rem}
+.atk.used .atk-n{opacity:.55;text-decoration:line-through}
+.pet h4{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin:.9rem 0 .45rem}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.trait{font-size:.92rem;padding:.2rem .65rem;border-radius:99px;background:var(--surface2);border:1px solid var(--border)}
+.trait.fire{border-color:var(--sch-fogo);color:var(--sch-fogo);font-weight:700}
+.pet-pv{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;background:var(--surface2);border-radius:var(--r2);padding:.55rem .7rem;margin-bottom:.9rem}
+.pet-pv .lbl{font-size:.8rem;font-weight:800;letter-spacing:.06em;color:var(--muted)}
+.pet-pv b{font-size:1.9rem;color:var(--pv);font-variant-numeric:tabular-nums;line-height:1}
+.pet-pv .bar{flex-basis:100%;margin:.2rem 0}
+.sanct{margin-top:.4rem;padding:.5rem .7rem;border-left:4px solid var(--pmd);background:var(--surface2);border-radius:0 var(--r2) var(--r2) 0;font-size:.95rem}
+@media(max-width:640px){.attrs{grid-template-columns:repeat(3,1fr)}.tiles{grid-template-columns:repeat(3,1fr)}}
+
+/* ── Diário e formulários ── */
+.dhead{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:1rem}
+.dhead .seg{flex-wrap:wrap}
+.dtop{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:1rem;margin-bottom:1.2rem;align-items:start}
+.recap .panel-b{font-family:var(--serif);font-size:1.08rem;white-space:pre-wrap}
+.counter{display:flex;align-items:baseline;gap:.4rem}
+.counter b{font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--pa)}
+.counter.xp b{color:var(--accent)}
+.mini-form{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}
+.mini-form input{flex:1;min-width:150px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:.4rem .6rem;color:var(--text);font:inherit;min-height:36px}
+.mini-form input[type=number]{max-width:110px}
+.txlog{list-style:none;margin-top:.6rem;font-size:.92rem;color:var(--text2)}
+.txlog li{display:flex;justify-content:space-between;gap:.5rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
+.txlog .pos{color:var(--pmd);font-weight:700}.txlog .neg{color:var(--danger);font-weight:700}
+.dbar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:.8rem}
+.dsearch{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:.5rem 1rem;color:var(--text);font:inherit;min-height:40px}
+.ditem .panel-h{align-items:flex-start}
+.ditem .panel-h h3{flex:1}
+.ditem .meta{font-size:.9rem;color:var(--text2);margin-bottom:.35rem}
+.ditem .txt{white-space:pre-wrap;font-family:var(--serif);font-size:1.06rem;line-height:1.6}
+.ditem .txt.clip{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.ditem .lbl{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:.6rem}
+.ditem.done{opacity:.6}
+.chip.good{color:var(--pmd);border-color:currentColor}.chip.bad{color:var(--danger);border-color:currentColor}
+.chip.warn{color:var(--pa);border-color:currentColor}.chip.info{color:var(--pma);border-color:currentColor}
+.empty{padding:1.5rem;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:var(--r)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem}
+.field{display:flex;flex-direction:column;gap:.25rem}
+.field.wide{grid-column:1/-1}
+.field label{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:.55rem .7rem;color:var(--text);font:inherit;font-size:1rem;min-height:42px}
+.field textarea{min-height:130px;resize:vertical;font-family:var(--serif);font-size:1.08rem;line-height:1.6}
+.field textarea.tall{min-height:260px}
+.field input:focus,.field select:focus,.field textarea:focus,.dsearch:focus,.mini-form input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.mf .danger{color:var(--danger);border-color:var(--danger);margin-right:auto}
+@media(max-width:900px){.dtop{grid-template-columns:1fr}}
+
+/* ── Barra lateral de buffs ── */
+.side{position:sticky;top:var(--hud-h,0px);max-height:calc(100vh - var(--hud-h,0px) - 4.5rem);overflow-y:auto;border-left:1px solid var(--border);background:var(--surface);padding:1.1rem 1rem 2rem;display:flex;flex-direction:column;gap:1.2rem}
+.side h3{font-size:.85rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin-bottom:.55rem}
+.side-close{display:none}
+.pilhas{display:grid;grid-template-columns:repeat(4,1fr);gap:.3rem}
+.pilhas button{border:1px solid var(--border);background:var(--surface2);border-radius:var(--r2);padding:.45rem 0;cursor:pointer;font-weight:800;min-height:40px}
+.pilhas button[aria-pressed="true"]{background:var(--sch-fogo);border-color:var(--sch-fogo);color:var(--bg)}
+.pilha-info{font-size:.92rem;color:var(--text2);margin-top:.45rem;line-height:1.45}
+.buff{display:flex;gap:.7rem;align-items:center;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:.55rem .7rem;cursor:pointer;margin-bottom:.4rem}
+.buff:hover{border-color:var(--accent)}
+.sw{width:38px;height:22px;border-radius:99px;background:var(--bg);border:1px solid var(--border);position:relative;flex-shrink:0;transition:background .2s}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.buff[aria-checked="true"] .sw{background:var(--accent);border-color:var(--accent)}
+.buff[aria-checked="true"] .sw::after{transform:translateX(16px);background:var(--on-accent)}
+.buff-t{flex:1;min-width:0}
+.buff-n{display:block;font-weight:700;font-size:.98rem}
+.buff-v{display:block;font-size:.88rem;color:var(--text2)}
+.buff-pm{font-size:.82rem;color:var(--pma);font-weight:700;white-space:nowrap}
+.side-hint{font-size:.88rem;color:var(--muted);line-height:1.45}
+
+/* ── Janela de detalhes ── */
+.mdl{position:fixed;inset:0;background:rgba(5,3,10,.62);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:1rem;z-index:60;animation:fade .15s ease}
+.mdl[hidden]{display:none}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.mdl-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:min(800px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:var(--shadow);overflow:hidden;animation:rise .18s ease}
+.mh{display:flex;gap:1rem;align-items:flex-start;padding:1.1rem 1.3rem;border-bottom:1px solid var(--border);background:linear-gradient(135deg,color-mix(in srgb,var(--sc) 22%,var(--surface)) 0%,var(--surface) 75%)}
+.mh-ico{font-size:1.8rem;width:3.2rem;height:3.2rem;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--sc) 25%,transparent)}
+.mh-txt{flex:1;min-width:0}
+.mh-eyebrow{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--sc)}
+.mh h2{font-family:var(--serif);font-size:1.8rem;line-height:1.15}
+.mh-lvl{font-family:var(--serif);font-style:italic;color:var(--text2);font-size:1.02rem}
+.mh-nav{display:flex;gap:.3rem;flex-shrink:0}
+.mb{overflow-y:auto;padding:1.2rem 1.3rem 1.4rem;display:flex;flex-direction:column;gap:1.2rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.5rem}
+.stats div{background:var(--surface2);border-radius:var(--r2);padding:.5rem .75rem}
+.stats dt{font-size:.76rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stats dd{font-size:1.02rem;color:var(--text);line-height:1.35}
+.mb h3{font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin-bottom:.45rem}
+.desc{font-family:var(--serif);font-size:1.17rem;line-height:1.72;max-width:70ch}
+.desc .rt{border-collapse:collapse;margin:.6rem 0;font-family:var(--sans);font-size:1rem}
+.desc .rt td{border:1px solid var(--border);padding:.2rem .7rem}
+.desc .rt td:first-child{font-weight:800;color:var(--sc);text-align:center}
+.desc .rt tr.hit td{background:color-mix(in srgb,var(--sc) 22%,transparent)}
+.tat{border-left:4px solid var(--sc);background:var(--surface2);border-radius:0 var(--r2) var(--r2) 0;padding:.8rem 1rem;font-size:1.04rem;line-height:1.62}
+.tags{display:flex;gap:.35rem;flex-wrap:wrap}
+.mf{display:flex;gap:.6rem;justify-content:flex-end;align-items:center;padding:.85rem 1.3rem;border-top:1px solid var(--border);flex-wrap:wrap;background:var(--surface)}
+.mf .pool-left{margin-right:auto;font-size:.92rem;color:var(--text2)}
+.calc{border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;background:color-mix(in srgb,var(--sc) 6%,var(--surface))}
+.opts{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;align-items:center}
+.opt{display:flex;align-items:center;gap:.45rem;border:1px solid var(--border);border-radius:99px;padding:.35rem .85rem;cursor:pointer;font-size:.97rem;background:var(--surface);min-height:40px}
+.opt input{accent-color:var(--accent);width:1.1rem;height:1.1rem;cursor:pointer}
+.opt:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,var(--surface))}
+.opt:has(input:disabled){opacity:.45;cursor:not-allowed}
+.opt small{color:var(--muted);font-size:.85rem}
+.calc-out{display:flex;gap:1rem 1.6rem;flex-wrap:wrap;align-items:flex-end}
+.big{font-size:2.3rem;font-weight:800;color:var(--sc);font-variant-numeric:tabular-nums;line-height:1.05}
+.big-l{font-size:.82rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.calc-sub{font-size:.98rem;color:var(--text2)}
+.calc-note{font-size:.92rem;color:var(--muted);margin-top:.6rem}
+.roll{margin-top:.8rem;display:flex;flex-direction:column;gap:.35rem}
+.roll-row{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+.die{min-width:2.1rem;text-align:center;padding:.15rem .4rem;border-radius:6px;border:1px solid var(--border);background:var(--surface2);font-weight:800;font-variant-numeric:tabular-nums}
+.die.mx{border-color:var(--accent);color:var(--accent)}
+.die.mn{border-color:var(--danger);color:var(--danger)}
+.roll-tot{font-size:1.5rem;font-weight:800;color:var(--sc);margin-left:.3rem}
+
+/* ── Notificação ── */
+#toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);z-index:80;background:var(--surface);color:var(--text);border:1px solid var(--accent);border-radius:var(--r);padding:.8rem 1.2rem;box-shadow:var(--shadow);font-size:1.05rem;max-width:min(560px,92vw);text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(-4px)}
+#toast .t-big{display:block;font-size:2rem;font-weight:800;color:var(--accent)}
+
+.footer{display:flex;flex-wrap:wrap;gap:.6rem 1.2rem;align-items:center;justify-content:space-between;padding:.8rem 1.5rem;border-top:1px solid var(--border);background:var(--surface);font-size:.95rem;color:var(--text2)}
+.fab{display:none}
+
+/* ── Responsivo ── */
+
+@media(max-width:1100px){
+ .main{grid-template-columns:1fr}
+ .side{position:fixed;top:0;right:0;height:100vh;max-height:none;width:min(340px,90vw);z-index:70;transform:translateX(105%);transition:transform .25s;box-shadow:var(--shadow)}
+ .side.open{transform:none}
+ .side-close{display:inline-flex;align-self:flex-end}
+ .scrim{position:fixed;inset:0;background:rgba(5,3,10,.5);z-index:65}
+ .scrim[hidden]{display:none}
+ .fab{display:inline-flex;position:fixed;right:1rem;bottom:1rem;z-index:40;border-radius:99px;box-shadow:var(--shadow);min-height:48px;padding:.5rem 1.1rem}
+ .res{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:640px){
+ .hud{display:contents}
+ .cond-bar{position:sticky;top:0;z-index:30;padding:.4rem 1rem;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+ html{font-size:16px}
+ .hdr,.res,.stats-bar,.content,.footer{padding-left:1rem;padding-right:1rem}
+ .tabs{padding:.4rem 1rem 0}
+ .res{grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+ .rc-val{font-size:1.75rem}
+ .grid,.panels{grid-template-columns:1fr}
+ .mdl{padding:0;align-items:flex-end}
+ .mdl-box{max-height:94vh;border-radius:16px 16px 0 0}
+ .mh h2{font-size:1.5rem}
+ .stats{grid-template-columns:1fr 1fr}
+ .stats dd{font-size:.95rem}
+ .mb{padding:1rem}
+ .desc{font-size:1.1rem}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#fx{display:none}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="app">
+<header class="hdr">
+ <div class="hdr-id">
+  <div class="hdr-name">Cael</div>
+  <div class="hdr-sub">Sprite · Druida Ermitã &amp; Maga Evocadora · Devota de Wynna</div>
+ </div>
+ <div class="hdr-actions">
+  <div class="seg" role="group" aria-label="Tema">
+   <button data-t="fada" onclick="setTheme('fada')">🌙 Fada</button>
+   <button data-t="chamas" onclick="setTheme('chamas')">🔥 Chamas</button>
+   <button data-t="pergaminho" onclick="setTheme('pergaminho')">📜 Pergaminho</button>
+  </div>
+  <button class="btn" onclick="rollFormula('1d20','d20')">⚄ d20</button>
+  <button class="btn primary" onclick="descansoLongo()">🌙 Descanso longo</button>
+  <span class="save-flag" id="save-flag" aria-live="polite"></span>
+ </div>
+</header>
+
+<section class="res" id="res" aria-label="Recursos"></section>
+<div class="hud" id="hud">
+ <div class="stats-bar" id="stats-bar"></div>
+ <div class="cond-bar" id="cond-bar" aria-label="Condições ativas"></div>
+</div>
+<div class="cpop" id="cpop" hidden role="dialog" aria-label="Condições"></div>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Seções do grimório"></nav>
+
+<div class="main">
+ <main class="content" id="content"></main>
+ <div class="scrim" id="scrim" hidden onclick="toggleSide(false)"></div>
+ <aside class="side" id="side" aria-label="Buffs ativos">
+  <button class="btn sm side-close" onclick="toggleSide(false)">✕ Fechar</button>
+  <div>
+   <h3>🔥 Em Chamas!</h3>
+   <div class="pilhas" id="pilhas" role="group" aria-label="Pilhas de Em Chamas!"></div>
+   <p class="pilha-info" id="pilha-info"></p>
+  </div>
+  <div>
+   <h3>✦ Buffs ativos</h3>
+   <div id="buffs"></div>
+   <p class="side-hint">Lançar a magia pela janela de detalhes já liga o buff e desconta o PM. Ligar aqui só marca o estado, sem custo.</p>
+  </div>
+ </aside>
+</div>
+
+<footer class="footer">
+ <span>CAR 20 (+5) · DES 18 (+4) · INT 16 (+3) · SAB 16 (+3) · FOR 8 (−1) · CON 8 (−1)</span>
+ <button class="btn sm" onclick="exportarMagias()">📄 Exportar magias</button>
+</footer>
+</div>
+
+<button class="btn primary fab" onclick="toggleSide(true)">✦ Buffs</button>
+
+<div class="mdl" id="mdl" hidden onclick="if(event.target===this)closeModal()">
+ <div class="mdl-box" role="dialog" aria-modal="true" aria-labelledby="mdl-title" id="mdl-box"></div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ═══ DADOS DAS MAGIAS ═══
+const SPELL_DB = [
+{"id": "globos_luz", "name": "Globos de Luz", "nivel": "N0", "pm": "0", "school": "sprite", "lvl": "arcana 0 (luz)", "exec": "Ação padrão", "alc": "30m", "alvo": "Até 4 esferas brilhantes", "dur": "1 minuto", "tr": "Nenhum", "cd": "—", "desc": "Este truque cria até quatro esferas de luz, que você pode posicionar onde quiser (até o alcance da magia). Você pode enviar uma esfera à frente, outra para trás, outra para cima e manter uma perto de você, por exemplo. Cada esfera ilumina tanto quanto uma tocha.", "cael": "<strong>Habilidade racial · 0 PM</strong>. Ilumina masmorras, marca posições para os aliados e cria distrações visuais. Alcance de 30m: dá para mandar uma esfera na frente do grupo e revelar o terreno antes de entrar.", "tags": ["Luz", "Sprite", "Sem PM"], "star": false, "prepared": true, "arcana": true},
+{"id": "som_fantasma", "name": "Som Fantasma", "nivel": "N0", "pm": "0", "school": "sprite", "lvl": "arcana 0 (ilusão)", "exec": "Ação padrão", "alc": "9m", "alvo": "Sons ilusórios", "dur": "1 minuto", "tr": "Vontade anula", "cd": "CD 13", "desc": "A magia cria um som que aumenta, diminui, se aproxima, afasta ou fica imóvel em um local fixo. Você escolhe o tipo de som (conversa, gritos, música, passos, galopes, rugidos ou qualquer outra coisa) quando faz a magia, e não pode mudá-lo depois. O volume máximo equivale ao som que cinco pessoas podem produzir.", "cael": "<strong>Habilidade racial · 0 PM</strong> · CD 13. Atrai guardas para longe, simula reforços chegando ou um alarme falso. O tipo de som é fixado na conjuração: decida antes o que o som precisa parecer.", "tags": ["Ilusão", "Sprite", "Sem PM"], "star": false, "prepared": true, "arcana": true},
+{"id": "prestidigitacao", "name": "Prestidigitação", "nivel": "N0", "pm": "0", "school": "sprite", "lvl": "arcana 0 (transmutação)", "exec": "Ação padrão", "alc": "9m", "alvo": "Veja texto", "dur": "1 minuto", "tr": "Nenhum", "cd": "—", "desc": "Esta magia serve para realizar pequenos truques mágicos inofensivos, que conjuradores novatos usam para treinar ou entreter uma audiência. Os efeitos são mínimos e severamente limitados, tais como: Erguer lentamente algo pesando até 500 gramas. Colorir, limpar ou sujar itens pequenos (incluindo peças de roupa), dentro de um espaço de 30cm por rodada. Aquecer, esfriar e/ou temperar (mas não produzir) até 500 gramas de material inanimado (incluindo comida). Prestidigitação não pode de nenhuma forma causar dano, e nem atrapalhar a concentração de um conjurador. Pode criar pequenos objetos, mas eles parecem mal feitos e artificiais, incapazes de enganar alguém. Materiais criados por prestidigitação são muito frágeis e não podem ser usados como instrumentos, ferramentas, armas ou componentes de magia.", "cael": "<strong>Habilidade racial · 0 PM</strong>. Ferramenta de roleplay: limpar o equipamento, esquentar a comida, um truque para impressionar um NPC. Não causa dano nem atrapalha conjuradores.", "tags": ["Transmutação", "Sprite", "Sem PM"], "star": false, "prepared": true, "arcana": true},
+{"id": "raio_fogo", "name": "Raio de Fogo", "nivel": "N0", "pm": "0", "school": "fogo", "lvl": "arcana 0 (fogo)", "exec": "Ação padrão", "alc": "9m", "alvo": "Raio", "dur": "Instantânea", "tr": "Reflexos (veja abaixo)", "cd": "CD 13", "desc": "Você dispara um raio de fogo. Faça um ataque de toque à distância. Se acertar, o alvo sofre 1d4 pontos de dano.", "cael": "<strong>0 PM</strong>. Com ½ nível: <strong>1d4+3</strong> (méd. 5,5). Com 3 pilhas de Em Chamas!: 1d4+6. Com Acumular Energia (+2 PM, ação de movimento): 1d6+3. Disparo de manutenção para poupar PM. <em>O texto do livro cita Reflexos “veja abaixo”, mas a regra não veio na cópia: confira no livro.</em>", "tags": ["Fogo", "Sem PM", "Toque distância"], "star": false, "prepared": true, "arcana": true},
+{"id": "combustao", "name": "Combustão", "nivel": "N2", "pm": "1", "school": "fogo", "lvl": "arcana 2 (fogo)", "exec": "Ação livre", "alc": "9m", "alvo": "1 criatura ou objeto", "dur": "Permanente, até o fogo ser apagado", "tr": "Nenhum", "cd": "—", "desc": "Para lançar esta magia basta estalar os dedos de uma das mãos. O alvo então entra em combustão, como se tivesse sido atingido por um frasco de fogo alquímico. Uma criatura em chamas sofre 1d6 pontos de dano no momento em que a magia é lançada, e mais 1d6 no início de cada turno do arcano, a menos que apague as chamas com uma ação completa. O arcano pode lançar esta magia em um objeto inanimado, mas ele só irá entrar em combustão se for um material propício (madeira seca, palha, roupas, etc.).", "cael": "<strong>1 PM · ação livre</strong> (Evocação Econômica). <strong>1d6+3</strong> ao lançar e 1d6+3 no início de cada turno da Cael, até o alvo gastar uma ação completa para apagar. Ação livre: cabe no mesmo turno de uma magia de ação padrão.", "tags": ["Fogo", "Ação livre", "Evocação Econômica", "Contínuo"], "star": true, "prepared": true, "arcana": true},
+{"id": "combustao_massa", "name": "Combustão em Massa", "nivel": "N3", "pm": "2", "school": "fogo", "lvl": "arcana 3 (fogo)", "exec": "Ação livre (como Combustão)", "alc": "9m", "alvo": "Até 5 criaturas ou objetos", "dur": "Permanente, até o fogo ser apagado", "tr": "Nenhum", "cd": "—", "desc": "Como combustão, mas afeta até cinco criaturas ou objetos.", "cael": "<strong>2 PM · ação livre</strong> (herdada de Combustão). Até 5 alvos com <strong>1d6+3</strong> cada (~32 no total) e o mesmo no início de cada turno seu. Maximizada (+3 PM = 5 PM): 9 por alvo = <strong>45</strong>. Cada inimigo atingido precisa gastar uma ação completa para se apagar.", "tags": ["Fogo", "Ação livre", "Área", "Evocação Econômica"], "star": true, "prepared": true, "arcana": true},
+{"id": "em_chamas", "name": "Em Chamas!", "nivel": "N2", "pm": "1", "school": "fogo", "lvl": "arcana 2 (fogo)", "exec": "Ação de movimento", "alc": "Pessoal", "alvo": "Você", "dur": "3 rodadas", "tr": "Nenhum", "cd": "—", "desc": "Esta magia cria uma aura de chamas translúcidas ao redor do arcano. Quaisquer magias que o arcano lançar com o descritor fogo causam +1 ponto de dano; ele recebe resistência a fogo 2, e qualquer criatura que atacá-lo em corpo-a-corpo sofre 2 pontos de dano de fogo. Esta magia pode ser usada até três vezes: seus efeitos se acumulam e a duração é renovada (assim, sob efeito de três magias, o conjurador causa +3 pontos de dano com magias de fogo, tem resistência a fogo 6 e qualquer criatura que atacá-lo em corpo-a-corpo sofre 6 pontos de dano de fogo). É possível lançar em chamas! uma quarta vez, antes que as primeiras magias se dissipem. Neste caso, a aura explode, causando 20 pontos de dano de fogo em cada criatura a até 6m do conjurador.", "cael": "<strong>1 PM · ação de movimento</strong> (Evocação Econômica). Libera a ação padrão para Bola de Fogo no mesmo turno. Pilhas: +1/+2/+3 de dano em magias de fogo, resistência 2/4/6, 2/4/6 em quem atacar corpo a corpo. A 4ª conjuração explode: <strong>20 fixo</strong> (não recebe ½ nível) em <em>toda</em> criatura a 6m, aliados inclusos. Fogo Amigo nos aliados resolve.", "tags": ["Fogo", "Aura", "Evocação Econômica", "Acumulável"], "star": true, "prepared": true, "arcana": true},
+{"id": "bola_fogo", "name": "Bola de Fogo", "nivel": "N3", "pm": "2", "school": "fogo", "lvl": "arcana 3 (fogo)", "exec": "Ação padrão", "alc": "30m", "alvo": "Explosão de 6m de raio", "dur": "Instantânea", "tr": "Reflexos reduz à metade", "cd": "CD 16", "desc": "Uma das mais famosas magias de ataque, a bola de fogo cria uma poderosa explosão de chamas. Você aponta o dedo e dispara uma pequena pedra flamejante, que explode quando atinge o local escolhido, causando 6d6 pontos de dano. Não é necessário fazer uma jogada de ataque, a menos que você queira lançar a bola de fogo através de uma passagem estreita. Neste caso, se errar, a bola de fogo pode bater em um obstáculo no caminho, explodindo antes do desejado.", "cael": "<strong>2 PM</strong> (Evocação Econômica). <strong>6d6+3</strong> (méd. 24). Maximizada (5 PM): <strong>39</strong>; com 3 pilhas de Em Chamas!: 42. Com Acumular Energia: 6d8+3 (méd. 30). O raio de 6m pega aliados: Fogo Amigo (2 PM, dura 1 hora) antes do combate.", "tags": ["Fogo", "Área", "Evocação Econômica"], "star": true, "prepared": true, "arcana": true},
+{"id": "flecha_chamas", "name": "Flecha de Chamas", "nivel": "N3", "pm": "2", "school": "fogo", "lvl": "arcana 3 (fogo)", "exec": "Ação padrão", "alc": "9m", "alvo": "Até 5 flechas (ou outra munição)", "dur": "1 hora", "tr": "Nenhum", "cd": "—", "desc": "Você transforma até cinco flechas normais (ou qualquer outro tipo de munição, como virotes, pedras, balas...) em versões flamejantes, que causam 1d6 pontos de dano adicional.", "cael": "<strong>2 PM · 1 hora</strong> (Evocação Econômica). <strong>+1d6+3</strong> por flecha (aplicando ½ nível). Com Velocidade e ação completa: 2 disparos no turno. São só 5 munições: cada disparo gasta uma.", "tags": ["Fogo", "Arco", "Evocação Econômica", "1 hora"], "star": true, "prepared": true, "arcana": true},
+{"id": "campo_forca", "name": "Campo de Força Menor", "nivel": "N3", "pm": "3", "school": "def", "lvl": "arcana 3 (abjuração, essência)", "exec": "Ação livre", "alc": "Pessoal", "alvo": "Você", "dur": "1 minuto", "tr": "Nenhum", "cd": "—", "desc": "Esta magia cria uma película protetora sobre a pele do arcano. A película absorve todos os golpes físicos, mas nenhum tipo de magia, dano elemental ou outros tipos de ataques. A magia se dissipa após absorver 20 pontos de dano.", "cael": "<strong>3 PM · ação livre · 1 minuto</strong>. Absorve <strong>só dano físico</strong>: magia, fogo, frio, eletricidade etc. passam direto. Por ser ação livre, ative no mesmo turno em que um inimigo de corpo a corpo encosta. O contador de absorção fica no topo da ficha.", "tags": ["Abjuração", "Ação livre", "Escudo 20"], "star": false, "prepared": true, "arcana": true},
+{"id": "armadura_arcana", "name": "Armadura Arcana", "nivel": "N1", "pm": "1", "school": "def", "lvl": "arcana 1 (abjuração)", "exec": "Ação padrão", "alc": "Toque", "alvo": "1 criatura", "dur": "1 hora", "tr": "Nenhum", "cd": "—", "desc": "Esta magia envolve o alvo com um campo de força invisível, mas tangível, fornecendo +4 na classe de armadura. Esse bônus é cumulativo com outras magias (por exemplo, um mago com armadura arcana e escudo arcano recebe +8 na CA), mas não com bônus fornecido por armaduras.", "cael": "<strong>1 PM · 1 hora</strong>. CA 23 → <strong>27</strong>; com Velocidade, <strong>29</strong>. Acumula com outras magias, não com armadura. Lance no começo do dia de aventura.", "tags": ["Abjuração", "Essencial"], "star": true, "prepared": true, "arcana": true},
+{"id": "fogo_amigo", "name": "Fogo Amigo", "nivel": "N2", "pm": "2", "school": "def", "lvl": "arcana 2 (abjuração)", "exec": "Ação padrão", "alc": "9m", "alvo": "Até 5 criaturas", "dur": "1 hora", "tr": "Nenhum", "cd": "—", "desc": "Os alvos desta magia podem ignorar qualquer dano e efeitos negativos causados pelas outras magias do conjurador. Caso haja outro conjurador no mesmo grupo, ele também deve lançar fogo amigo, ou suas magias poderão afetar seus aliados normalmente.", "cael": "<strong>2 PM · 1 hora · até 5 aliados</strong>. Destrava o kit de área da Cael: Bola de Fogo, Combustão em Massa e a explosão de Em Chamas! deixam de ferir o grupo. Lance junto com Armadura Arcana antes de entrar na masmorra.", "tags": ["Abjuração", "Grupo", "1 hora"], "star": true, "prepared": true, "arcana": true},
+{"id": "dados_nimb", "name": "Dados de Nimb", "nivel": "N2", "pm": "2", "school": "def", "lvl": "arcana 2, divina 2 (encantamento, caos)", "exec": "Ação padrão", "alc": "9m", "alvo": "Até 6 criaturas", "dur": "1 rodada", "tr": "Vontade anula", "cd": "CD 15", "desc": "Esta ilusão afeta até seis pessoas, desde que cada uma não esteja separada das outras por mais de 1,5m. Todos os afetados acreditam em qualquer resultado escolhido pelo conjurador para um lance de dados, cartas exibidas ou ação semelhante. Se possuírem razão para desconfiar, têm direito a um teste de Vontade: sucesso indica que não são afetadas. Passada a duração da magia, a memória do resultado falso permanece, já que as criaturas afetadas viram em suas mentes aquele resultado.", "cael": "<strong>2 PM arcano</strong> · CD 15. Trapaça em jogo de azar, resultado falso de um sorteio, uma carta “revelada” que nunca existiu. Os alvos precisam estar a no máximo 1,5m uns dos outros. Só pede teste quem tem motivo para desconfiar.", "tags": ["Encantamento", "Caos", "Arcana/Divina", "RP"], "star": false, "prepared": true, "arcana": true},
+{"id": "disfarce_ilusorio", "name": "Disfarce Ilusório", "nivel": "N1", "pm": "1", "school": "ilusao", "lvl": "arcana 1 (ilusão)", "exec": "Ação padrão", "alc": "Pessoal", "alvo": "Você", "dur": "1 hora", "tr": "Vontade (ao interagir)", "cd": "CD 14", "desc": "Você pode mudar sua aparência e a aparência de seu equipamento. Pode alterar sua altura, peso, tom de pele, etc. Esta magia fornece +10 em testes de Enganação para disfarces. Ela não oferece novas habilidades (você pode ficar parecido com outra raça, mas não ganhará nenhuma de suas habilidades raciais), nem muda seu equipamento (uma espada longa disfarçada como machado de batalha continua funcionando e causando dano como uma espada). Outras criaturas têm direito a um teste de Vontade para reconhecer a ilusão quando interagem com você.", "cael": "<strong>1 PM · 1 hora</strong>. O texto não limita tamanho: é o jeito de Cael <em>parecer</em> uma humana ou elfa, coisa que Alterar-se não alcança. Contrapartida: quem interage testa Vontade (CD 14).", "tags": ["Ilusão", "Disfarce", "Infiltração"], "star": false, "prepared": true, "arcana": true},
+{"id": "imagem_silenciosa", "name": "Imagem Silenciosa", "nivel": "N1", "pm": "1", "school": "ilusao", "lvl": "arcana 1 (ilusão)", "exec": "Ação padrão", "alc": "30m", "alvo": "Ilusão visual de até 4 cubos de 1,5m", "dur": "Concentração", "tr": "Vontade anula", "cd": "CD 14", "desc": "Esta magia cria uma miragem, uma ilusão visual imaginada por você: pessoas, animais, monstros, mobília, paredes, fogo... Um conjurador inteligente usa ilusões para enganar inimigos de muitas maneiras. A ilusão não cria sons, cheiros, texturas ou temperaturas, apenas imagens (mas veja as outras versões da magia). Você pode mover a imagem como quiser, dentro dos limites de tamanho do efeito. Objetos e criaturas sólidas atravessam uma ilusão sem causar ou sofrer dano. Imagem silenciosa nunca causa dano (mas pode, por exemplo, esconder uma armadilha ou inimigos). Alguém que veja a imagem tem direito a um teste de Vontade para perceber que se trata de uma ilusão.", "cael": "<strong>1 PM · concentração</strong> · CD 14. Parede falsa, porta escondida, reforços que não existem. Só imagem: qualquer coisa que devesse fazer barulho entrega a farsa. Para som, suba para Imagem Menor.", "tags": ["Ilusão", "Concentração"], "star": false, "prepared": true, "arcana": true},
+{"id": "alterar_se", "name": "Alterar-se", "nivel": "N2", "pm": "2", "school": "ilusao", "lvl": "arcana 2 (transmutação)", "exec": "Ação padrão", "alc": "Pessoal", "alvo": "Você", "dur": "1 hora (D)", "tr": "Nenhum", "cd": "—", "desc": "Você pode mudar sua aparência e forma — inclusive roupas e equipamento — para qualquer outra criatura, no máximo, uma categoria de tamanho menor ou maior. Você mantém suas estatísticas, mas recebe uma habilidade da forma selvagem do druida. Se sua nova forma não é capaz de falar ou não tem membros capazes de fazer gestos precisos, você não pode lançar magias até voltar a sua forma normal. Se usar esta magia para criar um disfarce, você recebe +10 no teste de Enganação.", "cael": "<strong>2 PM · 1 hora</strong>. Transformação real + uma habilidade da forma selvagem. <strong>Limite de tamanho:</strong> Cael é Mínima, então só alcança formas uma categoria acima (Minúscula), não uma humana. Forma sem fala ou sem mãos bloqueia magias até voltar.", "tags": ["Transmutação", "Disfarce", "Infiltração"], "star": false, "prepared": true, "arcana": true},
+{"id": "imagem_menor", "name": "Imagem Menor", "nivel": "N2", "pm": "2", "school": "ilusao", "lvl": "arcana 2 (ilusão)", "exec": "Ação padrão", "alc": "30m", "alvo": "Ilusão de até 4 cubos de 1,5m", "dur": "Concentração", "tr": "Vontade anula", "cd": "CD 15", "desc": "Como imagem silenciosa, mas inclui sons simples. Por exemplo, uma fogueira feita com uma imagem silenciosa não emite som algum, mas com imagem menor pode crepitar como fogo real. Nenhuma delas, no entanto, vai emitir calor ou cheiro de fumaça. Uma imagem menor não pode reproduzir vozes ou diálogos, apenas sons simples.", "cael": "<strong>2 PM · concentração</strong> · CD 15. Passos, rosnado, porta batendo — sem vozes. Cobre o ponto fraco da Imagem Silenciosa sem precisar gastar um Som Fantasma junto.", "tags": ["Ilusão", "Concentração", "Som"], "star": false, "prepared": true, "arcana": true},
+{"id": "imagem_maior", "name": "Imagem Maior", "nivel": "N3", "pm": "3", "school": "ilusao", "lvl": "arcana 3 (ilusão)", "exec": "Ação padrão", "alc": "30m", "alvo": "Ilusão de até 4 cubos de 1,5m", "dur": "Concentração", "tr": "Vontade anula", "cd": "CD 16", "desc": "Como imagem silenciosa, mas inclui ilusões sonoras, olfativas e térmicas. Enquanto se concentra, você pode deslocar a imagem dentro do alcance da magia.", "cael": "<strong>3 PM · concentração</strong> · CD 16. Som, cheiro e calor: a fogueira esquenta, o monstro fede. É a ilusão mais difícil de desmentir sem tocar nela.", "tags": ["Ilusão", "Concentração"], "star": false, "prepared": true, "arcana": true},
+{"id": "esfera_invisibilidade", "name": "Esfera de Invisibilidade", "nivel": "N3", "pm": "3", "school": "ilusao", "lvl": "arcana 3 (ilusão)", "exec": "Ação padrão", "alc": "Pessoal", "alvo": "Esfera de 3m de raio em torno de 1 criatura ou objeto", "dur": "1 minuto (D)", "tr": "Nenhum", "cd": "—", "desc": "Como invisibilidade, mas todas as criaturas a até 3m do alvo (incluindo ele próprio) se tornam invisíveis. O centro do efeito é móvel, juntamente com o alvo. O efeito se mantém a até 3m do alvo; qualquer coisa que se estenda além desse limite fica visível.", "cael": "<strong>3 PM · 1 minuto</strong>. O grupo inteiro some, desde que fique colado no alvo. Quem passa dos 3m aparece. A regra de quebrar a invisibilidade ao atacar está no texto de <em>Invisibilidade</em>, que não veio na cópia.", "tags": ["Ilusão", "Invisibilidade", "Grupo"], "star": true, "prepared": true, "arcana": true},
+{"id": "velocidade", "name": "Velocidade", "nivel": "N3", "pm": "3", "school": "util", "lvl": "arcana 3 (tempo)", "exec": "Ação padrão", "alc": "9m", "alvo": "1 criatura", "dur": "1 minuto", "tr": "Nenhum", "cd": "—", "desc": "O alvo se move e ataca rapidamente, recebendo +2 nas jogadas de ataque, CA e testes de Reflexos. Seu deslocamento aumenta em 9m e, se ele gastar uma ação completa, pode fazer um ataque adicional. Velocidade dissipa lentidão.", "cael": "<strong>3 PM · 1 minuto</strong>. Em Cael: CA 25 (29 com Armadura Arcana), Reflexos +6, voo 12m → 21m, 2 disparos com ação completa. Alcance 9m: num aliado de corpo a corpo o ataque extra pode render mais que em Cael.", "tags": ["Tempo", "Buff", "Auto/Aliado"], "star": true, "prepared": true, "arcana": true},
+{"id": "toque_nada", "name": "Toque do Nada", "nivel": "N3", "pm": "3", "school": "util", "lvl": "arcana 3 (encantamento)", "exec": "Ação padrão", "alc": "Toque", "alvo": "1 criatura", "dur": "1 minuto", "tr": "Vontade anula", "cd": "CD 16", "desc": "Esta magia isola a mente do alvo de seu corpo, fazendo com que ele perca seus cinco sentidos. O alvo torna-se cego, surdo, sem paladar e olfato e anestesiado (sem tato). O alvo não fica mudo, mas tem muita dificuldade de articular palavras sem audição e tato: há apenas 25% de chance de que qualquer frase seja inteligível. No início de cada rodada, o alvo tem 50% de largar qualquer objeto que esteja segurando. Também tem 50% de chance de errar qualquer ataque, fica desprevenido e sofre uma penalidade de –4 na CA (para um total de –8). Move-se com metade do seu deslocamento (em uma direção aleatória), sofre uma penalidade de –8 em testes de perícias baseadas em Força ou Destreza e falha automaticamente em testes de Percepção. Além disso, precisa fazer um teste de Vontade para lançar qualquer magia (CD 10 + nível da magia). Uma magia afetada pelo talento Magia Silenciosa não sofre essa limitação.", "cael": "<strong>3 PM · toque</strong> · CD 16. Neutraliza um alvo por 1 minuto: CA −8, 50% de errar ataques, conjuradores precisam passar em Vontade para lançar. O risco é chegar ao toque: entre com Velocidade ou com um aliado na frente.", "tags": ["Encantamento", "Toque", "Controle"], "star": false, "prepared": true, "arcana": true},
+{"id": "disco_flutuante", "name": "Disco Flutuante", "nivel": "N1", "pm": "1", "school": "util", "lvl": "arcana 1 (essência)", "exec": "Ação padrão", "alc": "9m", "alvo": "Disco de energia de 1m de diâmetro", "dur": "1 dia", "tr": "Nenhum", "cd": "—", "desc": "Você cria um plano de energia côncavo que carrega até 100kg. O disco segue o conjurador com deslocamento de 9m, flutuando 1m acima do chão. O disco desaparece se você se deslocar mais rápido e ele sair do alcance. Se o disco desaparecer, tudo que ele está carregando cai no chão.", "cael": "<strong>1 PM · 1 dia</strong>. Compensa a carga mínima da Sprite e carrega aliado caído. Cuidado: Cael voa 12m e o disco anda 9m — se ela correr na frente, a carga cai.", "tags": ["Essência", "Exploração", "1 dia"], "star": false, "prepared": true, "arcana": true},
+{"id": "visao_cacador", "name": "Visão do Caçador", "nivel": "N3", "pm": "3", "school": "util", "lvl": "arcana 3 (transmutação)", "exec": "Ação padrão", "alc": "Pessoal", "alvo": "Você", "dur": "1 hora", "tr": "Nenhum", "cd": "—", "desc": "O conjurador ganha uma visão especial, enxergando objetos e criaturas pela quantidade de calor que emitem. Esta visão infravermelha permite ao arcano ver criaturas invisíveis e ignorar camuflagem (incluindo camuflagem total). Além disso, concede +5 em testes de percepção visuais para notar criaturas escondidas, +5 em testes de Sobrevivência para rastrear e +2 nas jogadas de ataque.", "cael": "<strong>3 PM · 1 hora</strong>. +2 nos ataques com arco por uma hora inteira, vê invisíveis e ignora camuflagem total. Com o Faro do familiar, fecha a cobertura contra furtividade.", "tags": ["Transmutação", "Visão", "Buff"], "star": false, "prepared": true, "arcana": true},
+{"id": "maos_magicas", "name": "Mãos Mágicas", "nivel": "N0", "pm": "0", "school": "util", "lvl": "arcana 0 (transmutação)", "exec": "Ação padrão", "alc": "9m", "alvo": "1 objeto com até 2kg", "dur": "Concentração", "tr": "Nenhum", "cd": "—", "desc": "Você pode mover um objeto à distância. A cada rodada, você pode mover o objeto até 4,5m em qualquer direção (até o alcance da magia).", "cael": "<strong>0 PM</strong>. Alavancas, chaves e objetos suspeitos sem se expor. Com o tamanho Mínimo da Sprite, ótima para exploração furtiva.", "tags": ["Transmutação", "Sem PM", "Exploração"], "star": false, "prepared": true, "arcana": true},
+{"id": "mensagem", "name": "Mensagem", "nivel": "N0", "pm": "0", "school": "util", "lvl": "arcana 0 (transmutação)", "exec": "Ação padrão", "alc": "30m", "alvo": "1 criatura", "dur": "1 minuto", "tr": "Nenhum", "cd": "—", "desc": "Você e o alvo podem trocar mensagens telepaticamente. Mensagem transmite som, não significado ou seja, você e o alvo devem falar um idioma comum para se entenderem.", "cael": "<strong>0 PM</strong>. Cael faz o reconhecimento voando e reporta em silêncio. Exige idioma em comum com o alvo.", "tags": ["Transmutação", "Sem PM", "Scouting"], "star": false, "prepared": true, "arcana": true},
+{"id": "astucia_raposa", "name": "Astúcia da Raposa", "nivel": "N2", "pm": "2", "school": "util", "lvl": "arcana 2 (transmutação)", "exec": "Ação padrão", "alc": "Toque", "alvo": "1 criatura", "dur": "1 minuto", "tr": "Nenhum", "cd": "—", "desc": "Esta magia acelera o raciocínio do alvo, fornecendo Inteligência +4. Um aumento temporário de Inteligência não concede perícias ou PM adicionais, mas aumenta a CD para resistir a magias.", "cael": "<strong>2 PM · 1 minuto</strong>. INT 16 → 20 (mod +3 → +5): CD arcana <strong>13+N → 15+N</strong> (Bola de Fogo CD 18). Duração curta: só vale lançar no início de uma luta longa, antes das magias com TR. O toggle na barra lateral atualiza a CD exibida.", "tags": ["Transmutação", "Buff", "CD +2"], "star": false, "prepared": true, "arcana": true},
+{"id": "orientacao", "name": "Orientação", "nivel": "N0", "pm": "0", "school": "natureza", "arcana": false, "lvl": "divina 0 (adivinhação)", "exec": "Ação padrão", "alc": "Toque", "alvo": "1 criatura", "dur": "1 minuto ou até ser descarregada", "tr": "Nenhum", "cd": "—", "desc": "O alvo desta magia recebe um bônus de +1 em uma jogada ou teste realizado dentro da duração da magia. O bônus deve ser usado antes da jogada ou teste ser feito.", "cael": "<strong>Divina · 0 PM</strong>. +1 gratuito antes de um teste importante (Sobrevivência, Adestrar Animais, Diplomacia). Declare antes de rolar.", "tags": ["Adivinhação", "Divina", "Sem PM"], "star": false, "prepared": true},
+{"id": "purificar_alimentos", "name": "Purificar Alimentos", "nivel": "N0", "pm": "0", "school": "natureza", "arcana": false, "lvl": "divina 0 (transmutação)", "exec": "Ação padrão", "alc": "9m", "alvo": "Até 1kg de comida ou bebida", "dur": "Instantânea", "tr": "Nenhum", "cd": "—", "desc": "Esta magia purifica comida ou bebida suja, estragada, contaminada ou envenenada, deixando-a pronta para consumo.", "cael": "<strong>Divina · 0 PM</strong>. Água de poço suspeita, banquete de anfitrião duvidoso, rações estragadas: resolve sem custo.", "tags": ["Transmutação", "Divina", "Sem PM", "Exploração"], "star": false, "prepared": true},
+{"id": "intuir_direcao", "name": "Intuir Direção", "nivel": "N0", "pm": "0", "school": "natureza", "arcana": false, "lvl": "arcana 0, divina 0 (adivinhação)", "exec": "Ação padrão", "alc": "Pessoal", "alvo": "Você", "dur": "Instantânea", "tr": "Nenhum", "cd": "—", "desc": "Você consegue sentir a direção norte, o que fornece +4 em testes de Sobrevivência para não se perder.", "cael": "<strong>Divina · 0 PM</strong>. Sobrevivência +12 +4 = <strong>+16 para não se perder</strong>.", "tags": ["Adivinhação", "Arcana/Divina", "Sem PM"], "star": false, "prepared": true},
+{"id": "curar_ferimentos", "name": "Curar Ferimentos Leves", "nivel": "N1", "pm": "1", "school": "natureza", "arcana": false, "star": true, "lvl": "divina 1 (cura)", "exec": "Ação padrão", "alc": "Toque", "alvo": "1 criatura", "dur": "Instantânea", "tr": "Nenhum", "cd": "—", "desc": "Você canaliza energia positiva que recupera 1d8+1 pontos de vida da criatura tocada. Como mortos-vivos usam energia negativa, esta magia causa dano a eles.", "cael": "<strong>Divina · 1 PM</strong>. Cura <strong>1d8+1</strong> (méd. 5,5). O bônus de ½ nível é para <em>dano</em>, então não entra na cura. Contra morto-vivo vira dano variável: 1d8+1+3. Com 7 PM divinos, reserve para emergência; fora de combate, as poções e bálsamos do inventário.", "tags": ["Cura", "Divina", "Toque", "Emergência"], "prepared": true},
+{"id": "detectar_animais", "name": "Detectar Animais", "nivel": "N1", "pm": "1", "school": "natureza", "arcana": false, "lvl": "divina 1 (adivinhação)", "exec": "Ação padrão", "alc": "9m", "alvo": "Emanação em cone", "dur": "Concentração, até 3 rodadas", "tr": "Nenhum", "cd": "—", "desc": "Você detecta a presença, quantidade e condição de todos os animais na área, conforme a quantidade de rodadas que gastar se concentrando. Na primeira rodada, você percebe a presença de animais; na segunda rodada, percebe a quantidade de animais; por fim, na terceira rodada, a localização e condição de cada animal. Condição depende dos PV atuais. Um animal com mais de 90% de seus PV está saudável; entre 25 a 90%, está razoável; com menos de 25% está fraco; e um animal com 0 ou menos PV está moribundo. Esta magia não atravessa barreiras que excedam 90cm de terra ou madeira, 30cm de pedra, 2,5cm de metal comum, ou uma folha fina de chumbo.", "cael": "<strong>Divina · 1 PM · concentração</strong>. Rodada 1 presença, 2 quantidade, 3 posição e condição. Só animais: não detecta humanoides nem monstros.", "tags": ["Adivinhação", "Divina", "Exploração"], "star": false, "prepared": true},
+{"id": "remover_medo", "name": "Remover Medo", "nivel": "N1", "pm": "1", "school": "natureza", "arcana": false, "lvl": "divina 1 (abjuração)", "exec": "Ação padrão", "alc": "9m", "alvo": "1 criatura", "dur": "Instantânea", "tr": "Nenhum", "cd": "—", "desc": "Esta magia cura o alvo de qualquer efeito de medo.", "cael": "<strong>Divina · 1 PM</strong>. Aliado apavorado é um aliado fora do combate; 9m de alcance, sem toque.", "tags": ["Abjuração", "Divina", "Cura status"], "star": false, "prepared": true},
+{"id": "objeto_aleatorio", "name": "Objeto Aleatório", "nivel": "N1", "pm": "1", "school": "natureza", "arcana": false, "lvl": "arcana 1, divina 1 (caos, invocação)", "exec": "1 ação padrão", "alc": "9m", "alvo": "1 objeto", "dur": "1 minuto", "tr": "Nenhum", "cd": "—", "desc": "Você traz à existência um objeto qualquer. O mestre pode fazer aparecer qualquer item que achar interessante, ou rolar 2d6 na tabela abaixo.<table class=\"rt\"><tr><td>2</td><td>Um cajado</td></tr><tr><td>3</td><td>Uma bala de funda</td></tr><tr><td>4</td><td>Uma melancia</td></tr><tr><td>5</td><td>Um colar de pérolas falsas</td></tr><tr><td>6</td><td>Um barril grande cheio de manteiga</td></tr><tr><td>7</td><td>Um sabre obra-prima</td></tr><tr><td>8</td><td>Uma lente de aumento</td></tr><tr><td>9</td><td>Uma granada</td></tr><tr><td>10</td><td>Um escudo grande</td></tr><tr><td>11</td><td>Uma galinha</td></tr><tr><td>12</td><td>Um chapéu Enorme</td></tr></table>", "cael": "<strong>Divina · 1 PM · 1 minuto</strong>. Puro caos de Nimb. O botão de dado abaixo rola 2d6 e já mostra o objeto da tabela. Se o mestre preferir escolher, ele manda.", "tags": ["Caos", "Invocação", "Arcana/Divina"], "star": false, "prepared": true},
+{"id": "santuario", "name": "Santuário", "nivel": "N1", "pm": "1", "school": "natureza", "arcana": false, "star": true, "lvl": "divina 1 (abjuração)", "exec": "Ação padrão", "alc": "Toque", "alvo": "1 criatura", "dur": "1 minuto", "tr": "Vontade anula", "cd": "CD 14", "desc": "Qualquer inimigo que tente atacar o alvo (inclusive com magias ou habilidades especiais) deve fazer um teste de Vontade. Se falhar não consegue atacar, e não pode tentar novamente pela duração da magia. Santuário não protege o alvo de magias de área. O alvo também não pode executar nenhum tipo de ataque ou magia agressiva, ou o santuário será anulado — mas pode usar magias que não sejam de ataque ou agir de outras maneiras. Isso permite que a criatura protegida cure ferimentos, lance uma bênção, realize um augúrio, invoque criaturas para lutar por ela e assim por diante.", "cael": "<strong>Divina · 1 PM · 1 minuto</strong> · CD 14. Em um aliado caído ou no curandeiro do grupo. Em Cael só serve para turnos de suporte: qualquer magia agressiva (todo o arsenal de fogo) anula a proteção. Não protege contra área.", "tags": ["Abjuração", "Divina", "Proteção"], "prepared": true},
+// ═══ ESQUECIDAS (desativadas, mantidas para consulta) ═══
+{id:"raio_ardente",name:"Raio Ardente",nivel:"N2",pm:"1",school:"fogo",exec:"Ação padrão",alc:"30m",alvo:"1 alvo",dur:"Instantânea",tr:"Nenhum",cd:"—",desc:"Ataque de toque à distância. Se acertar: <strong>4d6+3 de fogo</strong> (sem TR!).",cael:"<strong>1 PM</strong> (Evocação Econômica). Sem TR — dano garantido se acertar. Méd. <strong>~17 dano</strong>. Com Acumular Energia (+2PM): <strong>4d8+3 (~21)</strong>. Com 3 pilhas Em Chamas!: +3 dano extra. Melhor dano concentrado ao alcance de 30m.",tags:["Fogo","Toque distância","Evocação Econômica"],star:true,prepared:true,arcana:true,off:true},
+{id:"pirotecnia",name:"Pirotecnia",nivel:"N2",pm:"1",school:"fogo",exec:"Ação padrão",alc:"30m",alvo:"1 chama ativa",dur:"1d4+1 rodadas",tr:"Vontade ou Fortitude",cd:"CD 15",desc:"Transforma uma chama em <strong>fogos de artifício</strong> (cegueira em área, CD 15 Vontade) ou <strong>fumaça densa</strong> (bloqueia visão + enjoo, CD 15 Fortitude — só ação padrão OU movimento).",cael:"<strong>1 PM</strong> (Evocação Econômica). Requer chama ativa. <strong>Fumaça:</strong> controle de área + enjoo paralisa inimigos. <strong>Fogos:</strong> cegueira em área. Combine com a magia Globos de Luz para criar a chama na hora.",tags:["Fogo","Ilusão","Controle","Evocação Econômica"],star:false,prepared:true,arcana:true,off:true},
+{id:"vitalidade_ilusoria",name:"Vitalidade Ilusória",nivel:"N2",pm:"2",school:"def",exec:"Ação padrão",alc:"Pessoal",alvo:"Você",dur:"1 hora",tr:"Nenhum",cd:"—",desc:"Recebe <strong>1d10+5 pontos de vida temporários</strong>. PV temporários são perdidos primeiro.",cael:"Com Maximizar (+3PM = <strong>5 PM total</strong>): <strong>15 PV temp fixos</strong>. Cael tem 21 PV — 15 temp = buffer de +71%! Combine com Campo de Força (20 PV abs.) para máxima durabilidade. Lance antes de combates.",tags:["Necromancia","PV Temporário"],star:true,prepared:true,arcana:true,off:true},
+{id:"clarao_esquecimento",name:"Clarão do Esquecimento",nivel:"N3",pm:"3",school:"ilusao",exec:"Ação padrão",alc:"9m",alvo:"Cone",dur:"Instantânea",tr:"Vontade anula",cd:"CD 16",desc:"Cone de luz intensa. Falha: alvo <strong>esquece as últimas 24 horas</strong> + fica cego por 1d4 rodadas.",cael:"<strong>3 PM</strong>. CD 16 Vontade. Esquecimento apaga testemunhas, desfaz alianças recentes, cancela informações obtidas. Cegueira em área como bônus. Situacional mas devastador quando relevante.",tags:["Ilusão","Luz","Controle","Cone"],star:false,prepared:true,arcana:true,off:true},
+{id:"gas_luigi",name:"Apavorante Gás de Luigi",nivel:"N0",pm:"0",school:"util",exec:"Ação padrão",alc:"9m",alvo:"1 criatura",dur:"1 minuto",tr:"Fortitude anula",cd:"CD 13",desc:"A vítima sofre flatulência incontrolável. <strong>−4 em Furtividade</strong>. Rastreadores pelo faro recebem +8 em Sobrevivência.",cael:"<strong>0 PM</strong>. CD 13. Altamente temático para a fada travessa. Arruína missões stealth inimigas, torna rastreamento trivial, e produz constrangimento cinematográfico. Confirme o Faro do familiar: +8+4 = +12 rastrear o alvo.",tags:["Ilusão","Sem PM","Travessa","Situacional"],star:false,prepared:true,arcana:true,off:true},
+{id:"arrombar",name:"Arrombar",nivel:"N2",pm:"2",school:"util",exec:"Ação padrão",alc:"9m",alvo:"1 porta/baú/janela",dur:"Instantânea",tr:"Nenhum",cd:"—",desc:"Abre portas, baús e janelas trancados. Afrouxa grilhões, solta correntes. Neutraliza Tranca Arcana por 10 minutos.",cael:"<strong>2 PM</strong>. Exploração básica. Combine com Mãos Mágicas para operar a distância. Se a porta tem Tranca Arcana, ainda funciona (neutraliza por 10 min). Útil para resgatar aliados presos.",tags:["Transmutação","Exploração"],star:false,prepared:true,arcana:true,off:true},
+{id:"choque_estatico",name:"Choque Estático",nivel:"N2",pm:"2",school:"util",exec:"Ação padrão",alc:"6m",alvo:"Arcos de eletricidade",dur:"1 minuto",tr:"Fortitude parcial",cd:"CD 15",desc:"Por 1 minuto: ação padrão → dispara arco a 6m causando <strong>2d8+3 de eletricidade + atordoado 1 rodada</strong>.",cael:"<strong>2 PM · sustentado 1 minuto</strong>. Componente: 5 anéis metálicos (não consumidos). CD 15. Alternativa elétrica quando fogo não for eficaz (resistência). Atordoamento é CC valioso para o grupo.",tags:["Eletricidade","Sustentado","CC"],star:false,prepared:true,arcana:true,off:true},
+{id:"bom_fruto",name:"Bom Fruto",nivel:"N1",pm:"1",school:"natureza",exec:"Ação padrão",alc:"Toque",alvo:"Até 4 frutos",dur:"1 dia",tr:"Nenhum",cd:"—",desc:"Transforma até 4 frutos recém-colhidos em itens mágicos. Cada um: alimenta como refeição completa e recupera <strong>1d4 PV</strong>.",cael:"<strong>Divina · 1 PM por dia · 4 frutos</strong>. Sustain fora de combate sem custo extra. Com Empatia Selvagem, Cael sempre consegue frutos adequados. <em>Reserve PM Divino para curas urgentes — use Bom Fruto para recuperação lenta.</em>",tags:["Transmutação","Divina","Cura leve","Exploração"],star:false,prepared:true,arcana:false,off:true},
+{id:"invis_animais",name:"Invisibilidade contra Animais",nivel:"N1",pm:"1",school:"natureza",exec:"Ação padrão",alc:"Toque",alvo:"1 criatura",dur:"10 minutos",tr:"Nenhum",cd:"—",desc:"Animais não detectam o alvo de nenhuma forma (visão, olfato, outros sentidos). Cancelado por ataque ou magia agressiva.",cael:"<strong>Divina · 1 PM · 10 minutos</strong>. Cael raramente precisa fugir de animais com Empatia Selvagem — mas aliados sim. Excelente para infiltrar regiões com guardiões animais ou cruzar territórios de criaturas selvagens.",tags:["Abjuração","Divina","Invisibilidade"],star:false,prepared:true,arcana:false,off:true}
+];
+// ═══ COMBOS ═══
+const COMBO_DB = [
+{"id": "piromania_rapida", "name": "Piromania Rápida", "pm": "3 PM", "type": "combat", "steps": ["Ação de movimento: <strong>Em Chamas!</strong> (1 PM). Aura ativa, +1 de dano em magias de fogo.", "Ação padrão: <strong>Bola de Fogo</strong> (2 PM). <strong>6d6+4</strong> (6d6 + 3 de ½ nível + 1 da pilha) em 6m, Reflexos CD 16 reduz.", "<em>Opcional:</em> com <strong>Acumular Energia</strong> no turno anterior (+2 PM, ação de movimento): 6d8+4 (méd. 31)."], "resultado": "Aura ativa e Bola de Fogo no mesmo turno. <strong>3 PM, ação inteira aproveitada.</strong>", "nota": "Com Fogo Amigo lançado antes da luta, não precisa poupar os aliados na mira."},
+{"id": "fada_infernal", "name": "Fada Infernal (Explosão)", "pm": "4 PM", "type": "combat", "steps": ["T1–T3: <strong>Em Chamas!</strong> como ação de movimento a cada turno (1 PM cada). 3 pilhas: +3 de dano em fogo, resistência 6, 6 em quem atacar corpo a corpo.", "T4: <strong>Em Chamas!</strong> pela 4ª vez, antes da dissipação: a aura <strong>explode</strong> causando <strong>20 de fogo</strong> em cada criatura a até 6m.", "A ação padrão de cada turno fica livre para Bola de Fogo, Raio de Fogo ou arco."], "resultado": "Três turnos de aura +3 e depois <strong>20 fixos em área</strong>, sem TR no texto.", "nota": "A explosão atinge todo mundo a 6m. Aliados com <strong>Fogo Amigo</strong> ignoram o dano; sem ele, avise antes."},
+{"id": "arco_chamas", "name": "Arco de Chamas", "pm": "5 PM", "type": "combat", "steps": ["Pré-combate: <strong>Flecha de Chamas</strong> (2 PM). 5 flechas com +1d6+3 de fogo por 1 hora.", "<strong>Velocidade</strong> (3 PM): +2 ataque, CA e Reflexos; voo 21m.", "Ação completa: 2 disparos de arco, cada um com 1d12 + 1d6+3 de fogo."], "resultado": "2 ataques por turno, cada um com ~13 de média. <strong>~26 por turno</strong> se os dois acertarem.", "nota": "Visão do Caçador (+2 ataque, 1 hora) soma bem aqui. As 5 flechas acabam em 3 turnos."},
+{"id": "desaparece_queima", "name": "Emboscada da Fada", "pm": "7 PM", "type": "combat", "steps": ["Antes: <strong>Fogo Amigo</strong> (2 PM) no grupo e <strong>Esfera de Invisibilidade</strong> (3 PM) para posicionar todo mundo.", "Abertura: <strong>Combustão em Massa</strong> (2 PM, <em>ação livre</em>) em até 5 inimigos: 1d6+3 em cada.", "No mesmo turno, ação padrão: <strong>Bola de Fogo</strong> sobre o grupo inimigo. Aliados dentro da área não sofrem nada."], "resultado": "Até 5 inimigos queimando e uma Bola de Fogo no primeiro turno. <strong>Abertura de combate demolidora.</strong>", "nota": "Duas magias no mesmo turno dependem de a mesa não limitar conjurações por rodada; confirme com o mestre."},
+{"id": "ciclo_familiar", "name": "Ciclo do Familiar", "pm": "0 PM", "type": "combat", "steps": ["<strong>Lulu (familiar)</strong> mantém o Faro: detecta invisíveis a 9m e elimina emboscadas.", "Ação de movimento: ordem ao companheiro animal para flanquear o alvo.", "<em>Flanqueamento:</em> +2 nos ataques de Cael contra o alvo flanqueado."], "resultado": "Detecção de invisíveis e flanqueamento constante. <strong>0 PM.</strong>", "nota": "Além do Lulu, a única detecção de invisibilidade é Visão do Caçador (3 PM). Mantenha o Lulu por perto."},
+{"id": "buffer_durabilidade", "name": "Fortaleza Alada", "pm": "7 PM", "type": "def", "steps": ["Início do dia: <strong>Armadura Arcana</strong> (1 PM, 1 hora): CA 23 → 27.", "Começo da luta: <strong>Velocidade</strong> (3 PM): CA 29, Reflexos +6, voo 21m.", "Quando o corpo a corpo encostar: <strong>Campo de Força Menor</strong> (3 PM, <em>ação livre</em>): 20 de absorção contra golpes físicos."], "resultado": "CA 29 e 20 de escudo físico sobre os 56 PV. <strong>Cael difícil de derrubar no braço.</strong>", "nota": "O Campo de Força não segura magia nem dano elemental. Contra conjuradores, a defesa é distância e Reflexos."},
+{"id": "infiltracao_total", "name": "Infiltração Total", "pm": "4 PM", "type": "rp", "steps": ["<strong>Esfera de Invisibilidade</strong> (3 PM): todo o grupo a até 3m do alvo fica invisível por 1 minuto.", "<strong>Disfarce Ilusório</strong> (1 PM, 1 hora): Cael parece outra pessoa, de qualquer tamanho, com +10 em Enganação.", "<strong>Mensagem</strong> (0 PM) para coordenar o grupo em silêncio."], "resultado": "Grupo invisível, Cael disfarçada e comunicação silenciosa. <strong>Infiltração completa por 4 PM.</strong>", "nota": "Alterar-se (2 PM) dá transformação real, mas só até tamanho Minúsculo. Para parecer humana, Disfarce Ilusório."},
+{"id": "wynna_fundamentalista", "name": "Dogma de Wynna", "pm": "0 PM", "type": "rp", "steps": ["Wynna exige: <em>nunca recusar-se a lançar uma magia que qualquer pessoa peça, não importa qual magia seja essa.</em>", "Se um aliado ou NPC pedir uma magia, Cael <strong>deve lançar</strong>, mesmo que seja perigosa para ela.", "<em>Recompensa:</em> +2 em duas habilidades e +5 PM. <em>Penalidade por quebrar:</em> perde habilidades de classe por 1 mês."], "resultado": "Cael obrigada a lançar qualquer magia pedida. <strong>Gera conflitos dramáticos.</strong>", "nota": "Bênção e fraqueza ao mesmo tempo. NPCs manipuladores podem explorar isso."}
+];
+
+// ═══ REGRAS DE DANO (½ nível = +3 só em dano variável de magia) ═══
+const HALF = 3;
+const DMG = {
+ raio_fogo:       {kind:'dmg',n:1,d:4,half:true,fire:true,lbl:'por acerto'},
+ combustao:       {kind:'dmg',n:1,d:6,half:true,fire:true,lbl:'ao lançar e no início de cada turno seu'},
+ combustao_massa: {kind:'dmg',n:1,d:6,half:true,fire:true,targets:5,lbl:'por alvo, ao lançar e a cada turno'},
+ bola_fogo:       {kind:'dmg',n:6,d:6,half:true,fire:true,lbl:'em cada criatura na área (Reflexos reduz à metade)'},
+ flecha_chamas:   {kind:'dmg',n:1,d:6,half:true,fire:true,lbl:'adicional por flecha que acertar'},
+ curar_ferimentos:{kind:'heal',n:1,d:8,flat:1,lbl:'PV recuperados (cura não recebe ½ nível)'},
+ objeto_aleatorio:{kind:'table',n:2,d:6},
+};
+const STEP = {4:6,6:8,8:10,10:12};
+const OBJ = {2:'Um cajado',3:'Uma bala de funda',4:'Uma melancia',5:'Um colar de pérolas falsas',6:'Um barril grande cheio de manteiga',7:'Um sabre obra-prima',8:'Uma lente de aumento',9:'Uma granada',10:'Um escudo grande',11:'Uma galinha',12:'Um chapéu Enorme'};
+
+const SCH = {
+ fogo:{icon:'🔥',label:'Fogo'}, def:{icon:'🛡',label:'Defesa'}, ilusao:{icon:'🎭',label:'Ilusão'},
+ util:{icon:'🔧',label:'Utilidade'}, natureza:{icon:'🌿',label:'Natureza'}, sprite:{icon:'✨',label:'Sprite'},
+};
+const SCHOOL_NOTES = {
+ fogo:'Evocação Econômica: magias de fogo custam 1 PM a menos (mínimo 1). Dano variável recebe +3 (½ nível); dano fixo, como a explosão de Em Chamas!, não. Combustão e Combustão em Massa são ação livre.',
+ def:'Pré-combate: Armadura Arcana (CA 27) e Fogo Amigo no grupo, ambos por 1 hora. Campo de Força Menor é ação livre e só segura dano físico.',
+ ilusao:'Disfarce Ilusório não tem limite de tamanho; Alterar-se só chega a Minúsculo para a Cael. As Imagens exigem concentração.',
+ util:'Velocidade pode ir em aliado (9m). Astúcia da Raposa dá +2 na CD arcana por 1 minuto.',
+ natureza:'PM Divino: só 7. Cura não recebe o bônus de ½ nível. Santuário cai se o protegido atacar.',
+ sprite:'Habilidades raciais: 0 PM, uso ilimitado.',
+};
+const TABS = [
+ {id:'fogo'},{id:'def'},{id:'ilusao'},{id:'util'},{id:'natureza'},{id:'sprite'},
+ {sep:true},
+ {id:'talentos',icon:'⚡',label:'Talentos'},
+ {id:'combos',icon:'◉',label:'Combos'},
+ {id:'companheiros',icon:'🐕',label:'Companheiros'},
+ {id:'diario',icon:'📓',label:'Diário'},
+ {id:'itens',icon:'🎒',label:'Itens & Perícias'},
+ {id:'esquecidas',icon:'📜',label:'Esquecidas'},
+];
+const BUFFS = [
+ {id:'armac',spell:'armadura_arcana',name:'Armadura Arcana',val:'+4 CA',pm:'1 PM · 1 h'},
+ {id:'veloc',spell:'velocidade',name:'Velocidade',val:'+2 ataque, CA e Reflexos · +9m',pm:'3 PM · 1 min'},
+ {id:'vcac',spell:'visao_cacador',name:'Visão do Caçador',val:'+2 ataque · vê invisíveis',pm:'3 PM · 1 h'},
+ {id:'famigo',spell:'fogo_amigo',name:'Fogo Amigo',val:'aliados ignoram suas magias',pm:'2 PM · 1 h'},
+ {id:'astucia',spell:'astucia_raposa',name:'Astúcia da Raposa',val:'INT +4 · CD arcana +2',pm:'2 PM · 1 min'},
+];
+
+// ═══ ESTADO PERSISTENTE ═══
+const KEY = 'cael_grimorio_estado_v1';
+const DEF = {pv:56,pvMax:56,campo:0,campoMax:20,pma:27,pmaMax:27,pmd:7,pmdMax:7,pa:0,pilhas:0,buffs:{},fam:28,brasa:48,pets:{fam:{buffs:{}},brasa:{buffs:{},forma:'lobo',baforada:false}},theme:'fada',tab:'fogo'};
+const LIMITS = {pvMax:56,campoMax:20,pmaMax:27,pmdMax:7,famMax:28,brasaMax:48};
+let S = loadState();
+let storageOk = true;
+
+function loadState(){
+ let s = JSON.parse(JSON.stringify(DEF));
+ try{
+  const raw = localStorage.getItem(KEY);
+  if(raw){ const o = JSON.parse(raw); Object.assign(s, o); s.buffs = Object.assign({}, o.buffs||{}); }
+  else { const t = localStorage.getItem('cael_grimorio_theme'); if(t) s.theme = t; }
+ }catch(e){}
+ Object.assign(s, {pvMax:LIMITS.pvMax,campoMax:LIMITS.campoMax,pmaMax:LIMITS.pmaMax,pmdMax:LIMITS.pmdMax});
+ const cl=(v,mx)=>Math.max(0,Math.min(mx,Number(v)||0));
+ s.pv=cl(s.pv,s.pvMax); s.campo=cl(s.campo,s.campoMax); s.pma=cl(s.pma,s.pmaMax); s.pmd=cl(s.pmd,s.pmdMax);
+ s.pa=Math.max(0,Number(s.pa)||0); s.pilhas=cl(s.pilhas,3); s.fam=cl(s.fam,LIMITS.famMax); s.brasa=cl(s.brasa??LIMITS.brasaMax,LIMITS.brasaMax); delete s.comp;
+ s.diario=normDiario(s.diario); s.extraPets=Array.isArray(s.extraPets)?s.extraPets.filter(x=>x&&x.id):[];
+ if(!['sessoes','npcs','lugares','missoes','ganchos'].includes(s.dtab)) s.dtab='sessoes';
+ const oc=s.cond||{}; s.cond={cael:[].concat(oc.cael||[]),brasa:[].concat(oc.brasa||[]),fam:[].concat(oc.fam||[])};
+ const op=s.pets||{}; s.pets={fam:Object.assign({buffs:{}},op.fam), brasa:Object.assign({buffs:{},forma:'lobo',baforada:false},op.brasa)};
+ if(!['fada','chamas','pergaminho'].includes(s.theme)) s.theme='fada';
+ return s;
+}
+function save(){
+ try{ localStorage.setItem(KEY, JSON.stringify(S)); storageOk = true; }
+ catch(e){ storageOk = false; }
+ const el = document.getElementById('save-flag');
+ if(!el) return;
+ if(storageOk){ const d=new Date(); el.className='save-flag'; el.textContent=`💾 Salvo ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+ else { el.className='save-flag err'; el.textContent='⚠ O navegador bloqueou o salvamento'; }
+}
+
+// ═══ RECURSOS ═══
+const RES = [
+ {k:'pv',mx:'pvMax',cls:'r-pv',label:'Pontos de Vida',ico:'♥',btns:[-5,-1,1,5]},
+ {k:'campo',mx:'campoMax',cls:'r-campo',label:'Campo de Força',ico:'⬡',hint:'só físico',btns:[-5,-1],extra:'<button class="btn sm" onclick="ativarCampo()">Ativar · 3 PM</button>'},
+ {k:'pma',mx:'pmaMax',cls:'r-pma',label:'PM Arcano',ico:'✦',btns:[-3,-2,-1,1]},
+ {k:'pmd',mx:'pmdMax',cls:'r-pmd',label:'PM Divino',ico:'❀',btns:[-1,1]},
+ {k:'pa',cls:'r-pa',label:'Pontos de Ação',ico:'★',hint:'dados pelo mestre',btns:[-1,1]},
+];
+function buildRes(){
+ document.getElementById('res').innerHTML = RES.map(r=>`<div class="rc ${r.cls}" id="rc-${r.k}">
+  <div class="rc-top"><span class="rc-label"><span>${r.ico}</span> ${r.label}</span>${r.hint?`<span class="rc-hint">${r.hint}</span>`:''}</div>
+  <div class="rc-val"><span id="v-${r.k}">0</span>${r.mx?` <span class="rc-max">/ ${S[r.mx]}</span>`:''}</div>
+  ${r.mx?`<div class="bar"><i id="b-${r.k}"></i></div>`:'<div style="height:.55rem"></div>'}
+  <div class="rc-btns">${r.btns.map(b=>`<button class="btn sm" onclick="adj('${r.k}',${b})" aria-label="${r.label} ${b>0?'+':''}${b}">${b>0?'+':'−'}${Math.abs(b)}</button>`).join('')}${r.mx&&r.k!=='campo'?`<button class="btn sm" onclick="adj('${r.k}',Infinity)">Máx</button>`:''}${r.extra||''}</div>
+ </div>`).join('');
+}
+function adj(k, d){
+ const r = RES.find(x=>x.k===k); const mx = r && r.mx ? S[r.mx] : Infinity;
+ S[k] = d===Infinity ? mx : Math.max(0, Math.min(mx, S[k]+d));
+ update(); save();
+}
+function ativarCampo(){
+ if(S.pma < 3){ toast(`PM arcano insuficiente: precisa de 3, tem ${S.pma}.`); return; }
+ S.pma -= 3; S.campo = S.campoMax; update(); save();
+ toast('⬡ Campo de Força Menor: 20 de absorção contra golpes físicos por 1 minuto (−3 PM).');
+}
+function descansoLongo(){
+ if(!confirm('Descanso longo:\n• PV, PM arcano e PM divino voltam ao máximo\n• Campo de Força, Em Chamas! e buffs são zerados\n• Lulu e Brasa: PV cheios, buffs zerados, baforada recarregada\n• Todas as condições são removidas\n• Companheiros adicionados: PV cheios, buffs zerados\n• Pontos de Ação NÃO mudam\n\nConfirmar?')) return;
+ Object.assign(S,{pv:S.pvMax,pma:S.pmaMax,pmd:S.pmdMax,campo:0,pilhas:0,buffs:{},fam:LIMITS.famMax,brasa:LIMITS.brasaMax,pets:{fam:{buffs:{}},brasa:{buffs:{},forma:S.pets.brasa.forma,baforada:false}},cond:{cael:[],brasa:[],fam:[]}});
+ S.extraPets.forEach(x=>{x.pv=x.pvMax;x.buffs={};});
+ update(); save(); if(['companheiros'].includes(S.tab)) renderContent();
+ toast('🌙 Descanso longo concluído. Recursos restaurados.');
+}
+
+// ═══ ATUALIZAÇÃO DA TELA ═══
+function update(){
+ RES.forEach(r=>{
+  const v=document.getElementById('v-'+r.k); if(v) v.textContent=S[r.k];
+  if(r.mx){ const pct=S[r.mx]?S[r.k]/S[r.mx]*100:0; const b=document.getElementById('b-'+r.k); if(b) b.style.width=pct+'%';
+   const rc=document.getElementById('rc-'+r.k); if(rc) rc.classList.toggle('low', (r.k==='pv'||r.k==='pma'||r.k==='pmd') && pct<=25); }
+ });
+ const on=id=>!!S.buffs[id];
+ const cm=condMods('cael'); const v=on('veloc')?2:0;
+ const ca = cm.caFix!=null ? cm.caFix : 23+(on('armac')?4:0)+v+cm.ca;
+ const arco=10+v+(on('vcac')?2:0)+cm.ranged, cac=3+v+cm.melee;
+ const ref=4+v+cm.ref, fort=1+cm.fort, von=10+cm.von, ini=9+cm.init;
+ const cdArc=13+(on('astucia')?2:0);
+ const voo=fmtM(cm.deslZero?0:cm.deslHalf?(12+(v?9:0))/2:12+(v?9:0));
+ const cls=(val,base)=>val>base?'boost':val<base?'debuff':'';
+ document.getElementById('stats-bar').innerHTML=[
+  [`🛡 CA <b>${ca}</b>`, cls(ca,23)],
+  [`🏹 Atk arco <b>${sg(arco)}</b>`, cls(arco,10)],
+  [`🗡 Atk CaC <b>${sg(cac)}</b>`, cls(cac,3)],
+  [`⛨ Fort <b>${sg(fort)}</b>`, cls(fort,1)],
+  [`↗ Ref <b>${sg(ref)}</b>`, cls(ref,4)],
+  [`👁 Von <b>${sg(von)}</b>`, cls(von,10)],
+  [`⚡ Inic <b>${sg(ini)}</b>`, cls(ini,9)],
+  [`🪽 Voo <b>${voo}</b>`, cls(parseFloat(voo.replace(',','.')),12)],
+  [`✨ CD arcana <b>${cdArc}+N</b>`, cdArc>13?'boost':''],
+  ['🌿 CD divina <b>13+N</b>',''],
+  [`🔥 Em Chamas! <b>×${S.pilhas}</b>`, S.pilhas?'hot':''],
+ ].map(([t,c])=>`<span class="st ${c}">${t}</span>`).join('');
+ const cb=document.getElementById('cond-bar'); const anyC=['cael','brasa','fam'].some(e=>S.cond[e].length);
+ cb.classList.toggle('on',anyC); cb.innerHTML=condBar();
+ document.documentElement.style.setProperty('--hud-h',(innerWidth>640?document.getElementById('hud').offsetHeight:0)+'px');
+ // pilhas
+ document.getElementById('pilhas').innerHTML=[0,1,2,3].map(n=>`<button aria-pressed="${S.pilhas===n}" onclick="setPilhas(${n})">${n}</button>`).join('');
+ document.getElementById('pilha-info').innerHTML = S.pilhas
+  ? `+${S.pilhas} dano em magias de fogo · resistência a fogo ${S.pilhas*2} · ${S.pilhas*2} de dano em quem atacar corpo a corpo.${S.pilhas===3?' <strong>Próxima conjuração explode (20 em 6m).</strong>':''}`
+  : 'Sem aura ativa.';
+ document.getElementById('buffs').innerHTML = BUFFS.map(b=>`<button class="buff" role="switch" aria-checked="${on(b.id)}" onclick="toggleBuff('${b.id}')">
+  <span class="sw"></span><span class="buff-t"><span class="buff-n">${b.name}</span><span class="buff-v">${b.val}</span></span><span class="buff-pm">${b.pm}</span></button>`).join('');
+}
+function setPilhas(n){ S.pilhas=n; update(); save(); refreshModal(); }
+function toggleBuff(id){ S.buffs[id]=!S.buffs[id]; if(id==='veloc'&&S.buffs[id]) dissipaLento('cael'); update(); save(); refreshModal(); }
+
+// ═══ ABAS E CONTEÚDO ═══
+function buildTabs(){
+ document.getElementById('tabs').innerHTML = TABS.map(t=>{
+  if(t.sep) return '<span class="tab-sep" aria-hidden="true"></span>';
+  const sc=SCH[t.id]; const icon=sc?sc.icon:t.icon; const label=sc?sc.label:t.label;
+  const style=sc?` style="--tc:var(--sch-${t.id})"`:'';
+  return `<button class="tab" role="tab" aria-selected="${S.tab===t.id}"${style} onclick="showTab('${t.id}')">${icon} ${label}</button>`;
+ }).join('');
+}
+function showTab(id){ S.tab=id; save(); buildTabs(); renderContent(); document.getElementById('content').scrollIntoView({block:'start',behavior:'smooth'}); }
+function visibleSpells(){ return S.tab==='esquecidas' ? SPELL_DB.filter(s=>s.off) : SPELL_DB.filter(s=>s.school===S.tab && !s.off); }
+
+function card(s){
+ const d=DMG[s.id]; const pool=s.arcana?'arc':'div';
+ const dmg = d && d.kind!=='table' ? `<span class="card-dmg">${calc(d,{}).f}${d.kind==='heal'?' de cura':''}${d.targets?' × '+d.targets:''}</span>` : '';
+ return `<button class="card${s.off?' off':''}" style="--sc:var(--sch-${s.school})" onclick="openSpell('${s.id}')">
+  <span class="card-ico" aria-hidden="true">${SCH[s.school].icon}</span>
+  <span class="card-main"><span class="card-name">${s.name}${s.star?' <span class="star" title="Favorita">★</span>':''}</span>
+  <span class="card-meta">${s.nivel} · ${s.exec}</span>${dmg}</span>
+  <span class="pm pm-${pool}">${s.pm} PM</span></button>`;
+}
+function renderContent(){
+ const el=document.getElementById('content'); const t=S.tab;
+ if(SCH[t]){
+  el.innerHTML=`<div class="ph" style="--tc:var(--sch-${t})"><h2>${SCH[t].icon} ${SCH[t].label}</h2><p>${SCHOOL_NOTES[t]}</p></div><div class="grid">${visibleSpells().map(card).join('')}</div>`;
+ } else if(t==='esquecidas'){
+  el.innerHTML=`<div class="ph"><h2>📜 Magias esquecidas</h2><p>Saíram do repertório atual e ficam guardadas para consulta, com os textos e valores antigos (ainda resumidos). Para reativar uma, troque <code>off:true</code> por <code>off:false</code> no arquivo.</p></div><div class="grid">${visibleSpells().map(card).join('')}</div>`;
+ } else if(t==='talentos') el.innerHTML=renderTalentos();
+ else if(t==='combos') el.innerHTML=renderCombos();
+ else if(t==='companheiros') el.innerHTML=renderCompanheiros();
+ else if(t==='diario') renderDiario();
+ else if(t==='itens') el.innerHTML=renderItens();
+}
+
+// ═══ CÁLCULO DE DANO ═══
+function calc(d,o){
+ let die=d.d; if(o.acc && d.kind==='dmg' && STEP[die]) die=STEP[die];
+ const parts=[];
+ if(d.half){ parts.push(`+${HALF} (½ nível)`); }
+ if(d.flat){ parts.push(`+${d.flat} (fixo da magia)`); }
+ if(d.fire && S.pilhas){ parts.push(`+${S.pilhas} (Em Chamas! ×${S.pilhas})`); }
+ const bonus=(d.half?HALF:0)+(d.flat||0)+(d.fire?S.pilhas:0);
+ return {die,bonus,parts,min:d.n+bonus,max:d.n*die+bonus,avg:d.n*(die+1)/2+bonus,f:`${d.n}d${die}${bonus?'+'+bonus:''}`};
+}
+const fmt=n=>Number.isInteger(n)?String(n):n.toFixed(1).replace('.',',');
+
+// ═══ JANELA DE DETALHES ═══
+let M = null;
+function openSpell(id){
+ M={id,max:false,acc:false,roll:null};
+ renderModal();
+ const m=document.getElementById('mdl'); m.hidden=false; document.body.classList.add('locked');
+ setTimeout(()=>document.querySelector('#mdl-box .x')?.focus(),30);
+}
+function closeModal(){ document.getElementById('mdl').hidden=true; document.body.classList.remove('locked'); M=null; F=null; }
+function refreshModal(){ if(M) renderModal(); }
+function navSpell(dir){
+ const list=visibleSpells(); const i=list.findIndex(s=>s.id===M.id); if(i<0) return;
+ const n=list[(i+dir+list.length)%list.length]; M={id:n.id,max:false,acc:false,roll:null}; renderModal();
+}
+function spellCost(s){ return Number(s.pm) + (M.max?3:0) + (M.acc?2:0); }
+function cdText(s){
+ if(!/\d/.test(s.cd)) return s.cd;
+ let n=parseInt(s.cd.replace(/\D/g,''),10);
+ if(s.arcana && S.buffs.astucia) return `CD ${n+2} <small>(Astúcia +2)</small>`;
+ return `CD ${n}`;
+}
+function renderModal(){
+ const s=SPELL_DB.find(x=>x.id===M.id); const d=DMG[s.id]; const pool=s.arcana?'pma':'pmd'; const poolName=s.arcana?'PM arcano':'PM divino';
+ const cost=spellCost(s);
+ const stats=[['Execução',s.exec],['Alcance',s.alc],['Alvo / área / efeito',s.alvo],['Duração',s.dur],['Resistência',s.tr],['CD',cdText(s)]];
+ let calcHTML='';
+ if(d && (d.kind==='dmg'||d.kind==='heal')){
+  const c=calc(d,M); const word=d.kind==='heal'?'cura':'dano';
+  const accDisabled = d.kind!=='dmg' || !STEP[d.d];
+  const tot = M.max ? c.max : null;
+  calcHTML=`<section class="calc"><h3>Calcular ${word}</h3>
+   <div class="opts">
+    <label class="opt"><input type="checkbox" ${M.max?'checked':''} onchange="M.max=this.checked;M.roll=null;renderModal()"> Maximizar <small>+3 PM</small></label>
+    <label class="opt"><input type="checkbox" ${M.acc?'checked':''} ${accDisabled?'disabled':''} onchange="M.acc=this.checked;M.roll=null;renderModal()"> Acumular Energia <small>+2 PM · ação de movimento</small></label>
+   </div>
+   <div class="calc-out">
+    <div><div class="big-l">${M.max?'Valor fixo':'Fórmula'}</div><div class="big">${M.max?tot:c.f}</div></div>
+    <div class="calc-sub">${M.max?`${c.f} no máximo`:`média <strong>${fmt(c.avg)}</strong> · mín ${c.min} · máx ${c.max}`}${d.targets?`<br>${d.targets} alvos: ${M.max?`<strong>${tot*d.targets}</strong> no total`:`média <strong>${fmt(c.avg*d.targets)}</strong> no total`}`:''}</div>
+    ${M.max?'':`<button class="btn" onclick="rollSpell()">🎲 Rolar ${c.f}${d.targets?' por alvo':''}</button>`}
+   </div>
+   ${M.roll?rollHTML(M.roll):''}
+   <p class="calc-note">${d.lbl}. ${c.parts.length?'Bônus: '+c.parts.join(' · ')+'.':'Sem bônus fixo.'}${accDisabled&&d.kind==='heal'?' Acumular Energia só vale para dano.':''}</p>
+  </section>`;
+ } else if(d && d.kind==='table'){
+  calcHTML=`<section class="calc"><h3>Rolar na tabela</h3><div class="calc-out"><button class="btn" onclick="rollTable()">🎲 Rolar 2d6</button>${M.roll?`<div><div class="big-l">Resultado ${M.roll.total}</div><div class="big">${OBJ[M.roll.total]}</div></div>`:''}</div></section>`;
+ }
+ const desc = (d&&d.kind==='table'&&M.roll) ? s.desc.replace(new RegExp(`<tr><td>${M.roll.total}</td>`),`<tr class="hit"><td>${M.roll.total}</td>`) : s.desc;
+ const tags=(s.tags||[]).map(t=>`<span class="chip">${t}</span>`).join('');
+ document.getElementById('mdl-box').style.setProperty('--sc',`var(--sch-${s.school})`);
+ document.getElementById('mdl-box').innerHTML=`
+ <header class="mh">
+  <div class="mh-ico" aria-hidden="true">${SCH[s.school].icon}</div>
+  <div class="mh-txt">
+   <div class="mh-eyebrow">${SCH[s.school].label} · ${s.nivel} · ${s.arcana?'Arcana':'Divina'}${s.off?' · Esquecida':''}</div>
+   <h2 id="mdl-title">${s.name}${s.star?' <span class="star">★</span>':''}</h2>
+   ${s.lvl?`<div class="mh-lvl">Nível: ${s.lvl}</div>`:''}
+  </div>
+  <div class="mh-nav">
+   <button class="btn sm" onclick="navSpell(-1)" aria-label="Magia anterior">‹</button>
+   <button class="btn sm" onclick="navSpell(1)" aria-label="Próxima magia">›</button>
+   <button class="btn sm x" onclick="closeModal()" aria-label="Fechar">✕</button>
+  </div>
+ </header>
+ <div class="mb">
+  <dl class="stats">${stats.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+  ${calcHTML}
+  <section><h3>Descrição</h3><div class="desc">${desc}</div></section>
+  <section class="tat"><h3>Cael — táticas</h3><div>${s.cael}</div></section>
+  ${tags?`<div class="tags">${tags}</div>`:''}
+ </div>
+ <footer class="mf">
+  ${condMods('cael').act?`<span class="mdl-warn">⚠ ${condMods('cael').act}</span>`:''}
+  <span class="pool-left">${poolName}: <strong>${S[pool]}</strong> / ${S[pool+'Max']}</span>
+  ${s.off?'':`<button class="btn primary" onclick="castSpell()" ${S[pool]<cost?'disabled':''}>Lançar · ${cost} ${poolName}</button>`}
+  <button class="btn" onclick="closeModal()">Fechar</button>
+ </footer>`;
+}
+function rollHTML(r){
+ return `<div class="roll">${r.rows.map((row,i)=>`<div class="roll-row">${r.rows.length>1?`<span class="chip">alvo ${i+1}</span>`:''}${row.dice.map(v=>`<span class="die ${v===row.sides?'mx':v===1?'mn':''}">${v}</span>`).join('')}${row.bonus?`<span>+${row.bonus}</span>`:''}<span class="roll-tot">= ${row.total}</span></div>`).join('')}${r.rows.length>1?`<div class="calc-sub">Total nos ${r.rows.length} alvos: <strong>${r.rows.reduce((a,b)=>a+b.total,0)}</strong></div>`:''}</div>`;
+}
+function rollSpell(){
+ const d=DMG[M.id]; const c=calc(d,M); const rows=[];
+ for(let t=0;t<(d.targets||1);t++){ const dice=[]; for(let i=0;i<d.n;i++) dice.push(rnd(c.die)); rows.push({dice,sides:c.die,bonus:c.bonus,total:dice.reduce((a,b)=>a+b,0)+c.bonus}); }
+ M.roll={rows}; renderModal();
+}
+function rollTable(){ M.roll={total:rnd(6)+rnd(6)}; renderModal(); }
+function castSpell(){
+ const s=SPELL_DB.find(x=>x.id===M.id); const pool=s.arcana?'pma':'pmd'; const cost=spellCost(s);
+ if(S[pool]<cost){ toast(`PM insuficiente: precisa de ${cost}, tem ${S[pool]}.`); return; }
+ S[pool]-=cost;
+ let extra='';
+ if(s.id==='em_chamas'){
+  if(S.pilhas<3){ S.pilhas++; extra=` Em Chamas! ×${S.pilhas}.`; }
+  else { S.pilhas=0; extra=' 💥 A aura explode: 20 de fogo em cada criatura a até 6m. Pilhas zeradas.'; }
+ }
+ if(s.id==='campo_forca') { S.campo=S.campoMax; extra=' 20 de absorção física.'; }
+ const b=BUFFS.find(x=>x.spell===s.id); if(b){ S.buffs[b.id]=true; extra=` ${b.name} ativo.`; if(b.id==='veloc') dissipaLento('cael'); }
+ const tags=[M.max?'maximizada':'',M.acc?'com Acumular Energia':''].filter(Boolean).join(', ');
+ update(); save(); renderModal();
+ toast(`${s.name}${tags?' ('+tags+')':''}: −${cost} ${s.arcana?'PM arcano':'PM divino'}.${extra}`);
+}
+
+// ═══ DADOS ═══
+function rnd(sides){ try{ const a=new Uint32Array(1); const lim=Math.floor(4294967296/sides)*sides; do{crypto.getRandomValues(a);}while(a[0]>=lim); return a[0]%sides+1; }catch(e){ return Math.floor(Math.random()*sides)+1; } }
+function rollFormula(f,label){
+ const m=f.match(/^(\d+)d(\d+)([+-]\d+)?$/i); if(!m) return;
+ const n=+m[1],sd=+m[2],mod=m[3]?+m[3]:0; const dice=[]; for(let i=0;i<n;i++) dice.push(rnd(sd));
+ const tot=dice.reduce((a,b)=>a+b,0)+mod;
+ const crit = (n===1&&sd===20) ? (dice[0]===20?' — CRÍTICO!':dice[0]===1?' — falha crítica':'') : '';
+ toast(`${label} · ${f}${crit}<span class="t-big">${tot}</span>${n>1||mod?`<small>${dice.join(' + ')}${mod?(mod>0?' + ':' − ')+Math.abs(mod):''}</small>`:''}`, 3500);
+}
+
+// ═══ CONDIÇÕES ═══
+const CONDS=[
+ {id:'abalado',n:'Abalado',ico:'😨',esc:true,txt:'O personagem fica com medo e sofre –2 em jogadas de ataque, testes de habilidade, perícia e resistência. Se ficar abalado novamente, passa a ficar Apavorado (tentando fugir a todo custo).'},
+ {id:'agarrado',n:'Agarrado',ico:'🤼',imp:['desprevenido'],txt:'Preso em combate corpo a corpo, fica Desprevenido, não pode se mover e sofre –2 nos ataques.'},
+ {id:'atordoado',n:'Atordoado',ico:'💫',imp:['desprevenido'],txt:'Incapaz de agir e fica Desprevenido.'},
+ {id:'caido',n:'Caído',ico:'⤵',txt:'Deitado no chão. Sofre –4 nos ataques corpo a corpo e tem deslocamento reduzido à metade. Oponentes ganham +4 para atacá-lo corpo a corpo, mas sofrem –4 em ataques à distância.'},
+ {id:'cego',n:'Cego',ico:'🙈',imp:['desprevenido'],txt:'Tem 50% de chance de errar qualquer ataque, fica Desprevenido, sofre –4 na Classe de Armadura e tem deslocamento reduzido à metade.'},
+ {id:'desprevenido',n:'Desprevenido',ico:'😶',txt:'Com a guarda baixa, sofrendo –4 na Classe de Armadura.'},
+ {id:'enjoado',n:'Enjoado',ico:'🤢',txt:'Só pode realizar uma ação padrão ou de movimento por rodada (não ambas).'},
+ {id:'fatigado',n:'Fatigado',ico:'😓',esc:true,txt:'Cansaço leve/moderado. Sofre –2 na Força e Destreza e não pode correr nem fazer investidas. Se ficar fatigado novamente, vira Exausto.'},
+ {id:'exausto',n:'Exausto',ico:'🥵',esc:true,txt:'Cansaço extremo. Sofre –6 na Força e Destreza, move-se à metade do deslocamento e não pode correr nem fazer investidas. Se ficar fatigado/exausto novamente enquanto já estiver exausto, cai Inconsciente.'},
+ {id:'indefeso',n:'Indefeso',ico:'⛓',txt:'Amarrado, inconsciente ou paralisado; tem CA 5 + modificador de tamanho e pode sofrer golpes de misericórdia.'},
+ {id:'lento',n:'Lento',ico:'🐢',txt:'Só realiza uma ação padrão ou de movimento por rodada, sofre –1 nas jogadas de ataque, CA e Reflexos, e tem deslocamento reduzido à metade.'},
+ {id:'paralisado',n:'Paralisado',ico:'🧊',imp:['indefeso'],txt:'Fica Indefeso, incapaz de se mover (Força e Destreza efetivas passam a 0), mas pode realizar ações puramente mentais.'},
+ {id:'pasmo',n:'Pasmo',ico:'😵',txt:'Incapaz de realizar ações (mas ainda pode se defender normalmente).'},
+ {id:'sangrando',n:'Sangrando',ico:'🩸',txt:'Sofre 1d4 pontos de dano no início de cada turno até passar num teste de Constituição (CD 15) ou receber cura.'},
+ {id:'apavorado',n:'Apavorado',ico:'😱',hidden:true,txt:'Abalado de novo: tenta fugir a todo custo. Mantém o –2 de Abalado.'},
+ {id:'inconsciente',n:'Inconsciente',ico:'💤',hidden:true,imp:['indefeso'],txt:'Exausto e cansado de novo: cai inconsciente e fica Indefeso.'},
+];
+const COND=Object.fromEntries(CONDS.map(c=>[c.id,c]));
+const ENT={cael:{n:'Cael',FOR:8,DES:18,CON:8,size:2,dexMelee:false},brasa:{n:'Brasa',FOR:24,DES:16,CON:16,size:-1,dexMelee:false},fam:{n:'Lulu',FOR:4,DES:15,CON:10,size:2,dexMelee:true}};
+const modN=v=>Math.floor((v-10)/2);
+const fmtM=n=>String(n).replace('.',',')+'m';
+function condSet(ent){
+ const set=new Map(); (S.cond[ent]||[]).forEach(id=>set.set(id,null));
+ let grew=true; while(grew){ grew=false; for(const [id] of [...set]) (COND[id].imp||[]).forEach(x=>{ if(!set.has(x)){ set.set(x,id); grew=true; } }); }
+ return set; // id → null (marcada) ou id de quem a causou
+}
+function condMods(ent){
+ const E=ENT[ent], set=condSet(ent), has=id=>set.has(id);
+ let F=E.FOR, D=E.DES;
+ if(has('exausto')){F-=6;D-=6;} else if(has('fatigado')){F-=2;D-=2;}
+ if(has('paralisado')){F=0;D=0;}
+ const dF=modN(F)-modN(E.FOR), dD=modN(D)-modN(E.DES);
+ const fear=(has('abalado')||has('apavorado'))?-2:0;
+ const atk=fear+(has('agarrado')?-2:0)+(has('lento')?-1:0);
+ const m={
+  melee: atk+(E.dexMelee?dD:dF)+(has('caido')?-4:0),
+  ranged: atk+dD,
+  dmg: E.dexMelee?0:dF,
+  ca: dD+(has('desprevenido')?-4:0)+(has('cego')?-4:0)+(has('lento')?-1:0),
+  caFix: has('indefeso')?5+E.size:null,
+  ref: fear+dD+(has('lento')?-1:0), fort: fear, von: fear, init: fear+dD, abil: fear,
+  deslZero: has('agarrado')||has('paralisado')||has('inconsciente'),
+  deslHalf: has('cego')||has('caido')||has('lento')||has('exausto'),
+  dF, dD, F, D, set,
+ };
+ const f=[];
+ if(has('inconsciente')) f.push('<strong>Inconsciente</strong>');
+ else if(has('paralisado')) f.push('<strong>Paralisado: só ações mentais</strong>');
+ else if(has('atordoado')) f.push('<strong>Atordoado: não pode agir</strong>');
+ else if(has('pasmo')) f.push('<strong>Pasmo: não pode agir</strong> (defende normalmente)');
+ else if(has('enjoado')||has('lento')) f.push('<strong>Só uma ação padrão OU de movimento</strong> por rodada');
+ m.act = f.length ? f[0].replace(/<[^>]+>/g,'') : '';
+ if(has('apavorado')) f.push('tenta fugir a todo custo');
+ if(has('cego')) f.push('50% de chance de errar ataques');
+ if(m.deslZero) f.push('não pode se mover'); else if(m.deslHalf) f.push('deslocamento à metade');
+ if(has('fatigado')||has('exausto')) f.push('não pode correr nem fazer investida');
+ if(has('caido')) f.push('inimigos: +4 corpo a corpo, −4 à distância contra ele');
+ if(has('indefeso')) f.push(`CA ${5+E.size} (5 + tamanho) · golpe de misericórdia`);
+ if(fear) f.push('testes de habilidade e perícias −2');
+ if(dD||dF) f.push(`FOR ${sg(dF)} e DES ${sg(dD)} no modificador`);
+ if(has('sangrando')) f.push('1d4 de dano no início de cada turno');
+ m.flags=f;
+ return m;
+}
+function condGrid(ent){
+ const L=S.cond[ent]||[], set=condSet(ent);
+ return CONDS.filter(c=>!c.hidden).map(c=>{
+  const on=L.includes(c.id)||(c.id==='abalado'&&L.includes('apavorado'))||(c.id==='exausto'&&L.includes('inconsciente'));
+  const imp=!on&&set.has(c.id);
+  return `<button class="cchip${imp?' implied':''}" aria-pressed="${on}" title="${c.txt}" onclick="addCond('${ent}','${c.id}')">${c.ico} ${c.n}</button>`;
+ }).join('');
+}
+function condActive(ent,open){
+ const set=condSet(ent); if(!set.size) return '';
+ const m=condMods(ent), E=ENT[ent];
+ const pills=[...set].map(([id,by])=>{const c=COND[id];
+  return by ? `<span class="cpill implied" title="${c.txt}">${c.ico} ${c.n} <small>(por ${COND[by].n})</small></span>`
+            : `<span class="cpill" title="${c.txt}">${c.ico} ${c.n}<button onclick="rmCond('${ent}','${id}')" aria-label="Remover ${c.n}">×</button></span>`;}).join('');
+ const bleed = set.has('sangrando') ? `<div class="cond-act"><button class="btn sm" onclick="bleed('${ent}')">🩸 Início do turno: −1d4 PV</button><button class="btn sm" onclick="conTest('${ent}')">🎲 Teste de CON (CD 15)</button></div>` : '';
+ return `<div class="cond-box"><div class="cond-row">${pills}</div>
+  <div class="cflags">${m.flags.join(' · ')}</div>${bleed}
+  <details class="cond-rules"${open?' open':''}><summary>Regras das condições ativas</summary><dl>${[...set].map(([id])=>`<dt>${COND[id].ico} ${COND[id].n}</dt><dd>${COND[id].txt}</dd>`).join('')}</dl></details></div>`;
+}
+function condChanged(ent,msg){ save(); update(); if(S.tab==='companheiros') renderContent(); refreshModal(); renderCondPop(); if(msg) toast(msg); }
+function condBar(){
+ return '<span class="cond-title">⚠ Condições</span>'+['cael','brasa','fam'].map(ent=>{
+  const set=condSet(ent), m=set.size?condMods(ent):null;
+  const pills=[...set].map(([id,by])=>{const c=COND[id];
+   return by ? `<span class="cpill implied" title="${c.txt}"><button class="cp-n" onclick="openCondPop('${ent}',this)">${c.ico} ${c.n}</button></span>`
+             : `<span class="cpill" title="${c.txt}"><button class="cp-n" onclick="openCondPop('${ent}',this)">${c.ico} ${c.n}</button><button onclick="rmCond('${ent}','${id}')" aria-label="Remover ${c.n} de ${ENT[ent].n}">×</button></span>`;}).join('');
+  return `<div class="cgroup${set.size?' on':''}"><span class="cond-who">${ENT[ent].n}</span>${pills}<button class="cadd" onclick="openCondPop('${ent}',this)" aria-label="Condições de ${ENT[ent].n}" title="Adicionar ou ver condições">+</button>${m&&m.act?`<span class="cact">${m.act}</span>`:''}</div>`;
+ }).join('');
+}
+let CP=null;
+function openCondPop(ent,el){
+ if(CP&&CP.ent===ent){ closeCondPop(); return; }
+ const r=el.getBoundingClientRect(); CP={ent,top:r.bottom+6,left:r.left};
+ renderCondPop(); document.getElementById('cpop').hidden=false; placeCondPop();
+}
+function placeCondPop(){
+ if(!CP) return; const pop=document.getElementById('cpop'); const w=pop.offsetWidth;
+ pop.style.left=Math.max(8,Math.min(CP.left,innerWidth-w-8))+'px';
+ pop.style.top=Math.min(CP.top,innerHeight-Math.min(pop.offsetHeight,innerHeight*.7)-8)+'px';
+}
+function renderCondPop(){
+ if(!CP) return; const ent=CP.ent;
+ document.getElementById('cpop').innerHTML=`<div class="cpop-h"><h3>⚠ Condições · ${ENT[ent].n}</h3><button class="btn sm" onclick="closeCondPop()" aria-label="Fechar">✕</button></div>
+  <div class="conds">${condGrid(ent)}</div>
+  ${condActive(ent,true)}
+  <p class="cpop-hint">Abalado, Fatigado e Exausto: clicar de novo agrava (Apavorado, Exausto, Inconsciente) e a remoção é pelo ×. As demais ligam e desligam no clique.</p>`;
+}
+function closeCondPop(){ CP=null; document.getElementById('cpop').hidden=true; }
+document.addEventListener('pointerdown',e=>{
+ if(!CP) return;
+ if(e.target.closest('#cpop')||e.target.closest('.cadd')||e.target.closest('.cp-n')||e.target.closest('.pet-cond-btn')) return;
+ closeCondPop();
+},true);
+addEventListener('resize',()=>{ update(); placeCondPop(); });
+function addCond(ent,id){
+ const L=S.cond[ent], has=x=>L.includes(x), rm=x=>{const i=L.indexOf(x); if(i>=0) L.splice(i,1);};
+ const who=ENT[ent].n; let msg='';
+ if(id==='abalado'&&(has('abalado')||has('apavorado'))){ rm('abalado'); if(!has('apavorado')) L.push('apavorado'); msg=`😱 ${who} ficou abalado de novo: agora está Apavorado.`; }
+ else if((id==='fatigado'||id==='exausto')&&(has('exausto')||has('inconsciente'))){ rm('exausto'); rm('fatigado'); if(!has('inconsciente')) L.push('inconsciente'); msg=`💤 ${who} já estava exausto: caiu Inconsciente.`; }
+ else if(id==='fatigado'&&has('fatigado')){ rm('fatigado'); L.push('exausto'); msg=`🥵 ${who} fatigado de novo: agora está Exausto.`; }
+ else if(id==='exausto'){ rm('fatigado'); L.push('exausto'); }
+ else if(has(id)){ rm(id); }
+ else L.push(id);
+ condChanged(ent,msg);
+}
+function rmCond(ent,id){ const L=S.cond[ent]; const i=L.indexOf(id); if(i>=0) L.splice(i,1); condChanged(ent); }
+function dissipaLento(ent){ const L=S.cond[ent]; const i=L.indexOf('lento'); if(i>=0){ L.splice(i,1); toast(`🐢 Velocidade dissipou a lentidão de ${ENT[ent].n}.`); } }
+function bleed(ent){
+ const r=rnd(4);
+ if(ent==='cael'){ S.pv=Math.max(0,S.pv-r); } else { S[ent]=Math.max(0,S[ent]-r); }
+ condChanged(ent,`🩸 ${ENT[ent].n} sangrou ${r} PV.`);
+}
+function conTest(ent){
+ const E=ENT[ent], m=condMods(ent), r=rnd(20), mo=modN(E.CON)+m.abil, tot=r+mo, ok=tot>=15;
+ if(ok){ const L=S.cond[ent]; L.splice(L.indexOf('sangrando'),1); }
+ condChanged(ent); toast(`Teste de CON · ${ENT[ent].n}: ${r} ${mo>=0?'+':'−'} ${Math.abs(mo)}<span class="t-big">${tot}</span>${ok?'Passou (CD 15): parou de sangrar.':'Falhou (CD 15): continua sangrando.'}`,3500);
+}
+
+// ═══ ABAS DE TEXTO ═══
+function renderTalentos(){
+ const pil=S.pilhas; S.pilhas=0;
+ const bf=calc(DMG.bola_fogo,{}), bfa=calc(DMG.bola_fogo,{acc:true});
+ const out = `<div class="ph"><h2>⚡ Talentos e metamagia</h2><p>Talentos do Mago Evocador e a metamagia usada pela Cael. Maximizar e Acumular Energia se escolhem <strong>na hora de lançar</strong>, dentro da janela de cada magia, e o custo aparece no botão Lançar.</p></div>
+ <div class="panels">
+ <article class="panel"><div class="panel-h"><h3>🔥 Evocação Econômica</h3><span class="chip">Passivo</span></div><div class="panel-b">
+  <p>Todas as suas magias com descritor ácido, eletricidade, fogo ou frio (um deles, à sua escolha) custam 1 PM a menos para serem lançadas (mínimo 1). <strong>Escolha da Cael: fogo.</strong></p>
+  <table class="mini-tbl"><tr><th>Magia</th><th>Custo</th></tr>
+   <tr><td>Raio de Fogo (N0)</td><td>0 PM</td></tr>
+   <tr><td>Combustão · Em Chamas! (N2)</td><td>2 → 1 PM</td></tr>
+   <tr><td>Bola de Fogo · Flecha de Chamas · Combustão em Massa (N3)</td><td>3 → 2 PM</td></tr></table>
+  <p class="note">Magias de N0 já custam 0; a redução não as afeta.</p></div></article>
+ <article class="panel"><div class="panel-h"><h3>⚡ Acumular Energia</h3><span class="chip cost">2 PM + movimento</span></div><div class="panel-b">
+  <p>Gasta 2 PM e uma ação de movimento para aumentar o tipo de dado do dano do próximo ataque: d4→d6, d6→d8, d8→d10, d10→d12. Funciona apenas com magias que rolam dano. É cumulativo com Maximizar e Potencializar.</p>
+  <table class="mini-tbl"><tr><th>Exemplo</th><th>Resultado</th></tr>
+   <tr><td>Bola de Fogo normal</td><td>${bf.f} · méd. ${fmt(bf.avg)}</td></tr>
+   <tr><td>Bola de Fogo + Acumular (4 PM)</td><td>${bfa.f} · méd. ${fmt(bfa.avg)}</td></tr>
+   <tr><td>+ Acumular + Maximizar (7 PM)</td><td>${bfa.max} fixo</td></tr></table>
+  <p class="note">Em Chamas! também usa a ação de movimento: no mesmo turno, é um ou outro.</p></div></article>
+ <article class="panel"><div class="panel-h"><h3>☀ Maximizar Magia</h3><span class="chip cost">+3 PM</span></div><div class="panel-b">
+  <p>Aplicada a uma magia específica, no momento em que ela é lançada: os efeitos variáveis ficam no valor máximo, sem rolar dados. Só a magia narrada como maximizada recebe o efeito.</p>
+  <table class="mini-tbl"><tr><th>Magia maximizada</th><th>Valor</th></tr>
+   <tr><td>Bola de Fogo (5 PM)</td><td>${calc(DMG.bola_fogo,{}).max}</td></tr>
+   <tr><td>Combustão em Massa (5 PM)</td><td>${calc(DMG.combustao_massa,{}).max} × 5 = ${calc(DMG.combustao_massa,{}).max*5}</td></tr>
+   <tr><td>Curar Ferimentos Leves (4 PM div.)</td><td>${calc(DMG.curar_ferimentos,{}).max} PV</td></tr></table>
+  <p class="note">Valores sem pilhas de Em Chamas!; com pilhas ativas, a janela da magia soma automaticamente.</p></div></article>
+ <article class="panel"><div class="panel-h"><h3>🚶 Sai da Frente!</h3><span class="chip">Ação livre · troca por 1 talento</span></div><div class="panel-b">
+  <p>Como ação livre, avisa os aliados para saírem da frente. Eles recebem <strong>Evasão</strong> contra aquela magia.</p>
+  <p class="note">Depende de a magia ter teste de Reflexos (Bola de Fogo tem). A explosão de Em Chamas! não tem teste no texto: ali, só Fogo Amigo protege.</p></div></article>
+ </div>`;
+ S.pilhas=pil; return out;
+}
+function renderCombos(){
+ const CL={combat:'Combate',def:'Defesa',rp:'Roleplay'};
+ const secs=[['🔥 Combate',['piromania_rapida','fada_infernal','arco_chamas','desaparece_queima','ciclo_familiar']],['🛡 Sobrevivência',['buffer_durabilidade']],['🎭 Roleplay e exploração',['infiltracao_total','wynna_fundamentalista']]];
+ return `<div class="ph"><h2>◉ Combos</h2><p>Sequências testadas com o repertório atual. Em Chamas! como ação de movimento é a base de quase tudo.</p></div>`+
+ secs.map(([lbl,ids])=>`<div class="sec">${lbl}</div><div class="panels">${ids.map(id=>{const c=COMBO_DB.find(x=>x.id===id); if(!c) return '';
+  return `<article class="panel"><div class="panel-h"><h3>${c.name}</h3><span class="chip cost">${c.pm}</span></div><div class="panel-b">
+   <ol class="steps">${c.steps.map(s=>`<li><span>${s}</span></li>`).join('')}</ol>
+   <div class="result">${c.resultado}</div><p class="note">${c.nota}</p></div></article>`;}).join('')}</div>`).join('');
+}
+const PET_BUFFS=[
+ {id:'armac',name:'Armadura Arcana',val:'+4 CA',pm:'1 PM · toque · 1 h'},
+ {id:'veloc',name:'Velocidade',val:'+2 ataque, CA e Reflexos · +9m · ataque extra com ação completa',pm:'3 PM · 9m · 1 min'},
+ {id:'sant',name:'Santuário',val:'inimigo testa Vontade (CD 14) para atacá-lo',pm:'1 PM div. · toque · 1 min'},
+];
+const PETS={
+ fam:{ico:'🐕',name:'Lulu',sub:'Familiar · Lulu da Pomerânia · Animal 1 · Neutro · Tamanho Mínimo',pv:'fam',
+  ca:14,melee:4,ranged:null,fort:2,ref:4,von:1,desl:9,init:null,
+  attr:{FOR:4,DES:15,CON:10,INT:4,SAB:12,CAR:6},
+  attacks:[{n:'Mordida',d:'Acuidade com Arma',atk:4,dmg:'1',fixed:true}],
+  skills:['Percepção +5'],traits:['Acuidade com Arma'],
+  notes:['PV = metade dos PV máximos da Cael (Vitalidade das Fadas incluída).','Faro: +4 em Sobrevivência para rastrear e percebe invisíveis a 9m <em>(da ficha anterior; confirme se continua valendo)</em>.']},
+ brasa:{ico:'🐺',name:'Brashtar · “Brasa”',sub:'Companheiro animal · Lobo · Tamanho Grande · nível 6 (acompanha a Cael)',pv:'brasa',
+  ca:21,melee:12,ranged:9,fort:6,ref:6,von:4,desl:9,init:12,
+  attr:{FOR:24,DES:16,CON:16,INT:6,SAB:12,CAR:2},
+  attacks:[{n:'Mordida',d:'corpo a corpo',atk:12,dmg:'1d8+10'},{n:'Baforada de Fogo',d:'1×/dia · TR CD 16 reduz à metade',dmg:'6d6',breath:true}],
+  skills:['Iniciativa +12'],
+  traits:['Brutalidade (+4 FOR)','Grande (+4 FOR · −1 CA e ataque · −4 Furtividade)','Arma Natural Aprimorada (dado maior)','Vitalidade (+1 PV/nível)','Armadura Natural Infernal + Couro Grosso (+6 CA)'],
+  fire:true,
+  notes:['<strong>Imune a fogo:</strong> Bola de Fogo, Combustão em Massa e a explosão de Em Chamas! não o ferem. Não precisa de Fogo Amigo.','Coleira com Alterar-se à vontade: alterna entre lobo comum e cão do inferno.']},
+};
+const mod=v=>{const m=Math.floor((v-10)/2);return (m>=0?'+':'−')+Math.abs(m);};
+const sg=n=>(n>=0?'+':'−')+Math.abs(n);
+function petStats(k){const p=PETS[k],b=S.pets[k].buffs,v=b.veloc?2:0,cm=condMods(k);
+ const d=p.desl+(v?9:0);
+ return{ca:cm.caFix!=null?cm.caFix:p.ca+(b.armac?4:0)+v+cm.ca,melee:p.melee+v+cm.melee,ranged:p.ranged==null?null:p.ranged+v+cm.ranged,
+  ref:p.ref+v+cm.ref,fort:p.fort+cm.fort,von:p.von+cm.von,init:p.init==null?null:p.init+cm.init,
+  deslN:cm.deslZero?0:cm.deslHalf?d/2:d,v,b,cm};}
+function petCard(k){
+ const p=PETS[k],st=petStats(k),b=st.b,ps=S.pets[k],mx=LIMITS[p.pv+'Max'],pv=S[p.pv];
+ const tile=(l,val,now,base)=>`<div class="tile${now>base?' boost':now<base?' debuff':''}"><dt>${l}</dt><dd>${val}</dd></div>`;
+ const forma = k==='brasa' ? `<div class="seg" role="group" aria-label="Aparência"><button aria-pressed="${ps.forma==='lobo'}" onclick="petForma('lobo')">🐺 Lobo</button><button aria-pressed="${ps.forma==='infernal'}" onclick="petForma('infernal')">🔥 Cão do inferno</button></div>` : '';
+ const atks=p.attacks.map(a=>{
+  if(a.breath) return `<div class="atk${ps.baforada?' used':''}"><span class="atk-n">🔥 ${a.n} · ${a.dmg}<small>${a.d}</small></span>
+   <button class="btn sm" onclick="rollFormula('${a.dmg}','${a.n}')">🎲 Rolar ${a.dmg}</button>
+   <button class="btn sm${ps.baforada?'':' primary'}" onclick="petBaforada()">${ps.baforada?'Usada hoje · desfazer':'Usar (1×/dia)'}</button></div>`;
+  const atk=a.atk+st.v+st.cm.melee;
+  let dmg=a.dmg; if(!a.fixed){ const m=a.dmg.match(/^(\d+d\d+)([+-]\d+)?$/); const fl=(m[2]?+m[2]:0)+st.cm.dmg; dmg=m[1]+(fl?(fl>0?'+':'')+fl:''); }
+  const mods=[st.v?'Velocidade +2':'',st.cm.melee?'condições '+sg(st.cm.melee):''].filter(Boolean).join(' · ');
+  return `<div class="atk"><span class="atk-n">${a.n} ${sg(atk)} · dano ${dmg}<small>${a.d}${mods?' · '+mods:''}</small></span>
+   <button class="btn sm" onclick="rollFormula('1d20${sg(atk).replace('−','-')}','${a.n} · ataque')">🎲 Ataque</button>
+   ${a.fixed?'':`<button class="btn sm" onclick="rollFormula('${dmg}','${a.n} · dano')">🎲 Dano</button>`}</div>`;
+ }).join('');
+ return `<article class="panel pet"><div class="panel-h"><h3>${p.ico} ${p.name}</h3>${forma}<span class="pet-sub">${p.sub}${k==='brasa'?` · aparência: <strong>${ps.forma==='lobo'?'lobo':'cão do inferno'}</strong>`:''}</span></div><div class="panel-b">
+  <div class="pet-pv"><span class="lbl">PV</span><b id="v-${p.pv}">${pv}</b><span class="rc-max">/ ${mx}</span>
+   <span style="flex:1"></span>
+   <button class="btn sm" onclick="adjPet('${p.pv}',-5)">−5</button><button class="btn sm" onclick="adjPet('${p.pv}',-1)">−1</button><button class="btn sm" onclick="adjPet('${p.pv}',1)">+1</button><button class="btn sm" onclick="adjPet('${p.pv}',5)">+5</button><button class="btn sm" onclick="adjPet('${p.pv}',Infinity)">Máx</button>
+   <div class="bar" style="--c:var(--pv)"><i id="b-${p.pv}" style="width:${pv/mx*100}%"></i></div></div>
+  <dl class="tiles">
+   ${tile('CA',st.ca,st.ca,p.ca)}
+   ${tile('Corpo a corpo',sg(st.melee),st.melee,p.melee)}
+   ${st.ranged!=null?tile('Distância',sg(st.ranged),st.ranged,p.ranged):''}
+   ${tile('Fortitude',sg(st.fort),st.fort,p.fort)}
+   ${tile('Reflexos',sg(st.ref),st.ref,p.ref)}
+   ${tile('Vontade',sg(st.von),st.von,p.von)}
+   ${tile('Desloc.',fmtM(st.deslN),st.deslN,p.desl)}
+   ${p.init!=null?tile('Iniciativa',sg(st.init),st.init,p.init):''}
+  </dl>
+  <div class="attrs">${Object.entries(p.attr).map(([a,v])=>{const e=a==='FOR'?st.cm.F:a==='DES'?st.cm.D:v; return `<div class="attr${e<v?' tile debuff':''}"><b>${a}</b><span>${e}</span><small>${mod(e)}</small></div>`;}).join('')}</div>
+  <h4>Ataques</h4>${atks}
+  <h4>Condições</h4>
+  <button class="btn sm pet-cond-btn" onclick="openCondPop('${k}',this)">⚠ ${S.cond[k].length?'Ver / alterar condições':'Aplicar condição'}</button>
+  ${condActive(k)}
+  <h4>Buffs da Cael</h4>
+  ${PET_BUFFS.map(x=>`<button class="buff" role="switch" aria-checked="${!!b[x.id]}" onclick="petBuff('${k}','${x.id}')"><span class="sw"></span><span class="buff-t"><span class="buff-n">${x.name}</span><span class="buff-v">${x.val}</span></span><span class="buff-pm">${x.pm}</span></button>`).join('')}
+  ${b.sant?'<div class="sanct">Santuário ativo: cai se ele atacar ou fizer algo agressivo, e não protege contra área.</div>':''}
+  <h4>Perícias, talentos e habilidades</h4>
+  <div class="chips">${p.fire?'<span class="trait fire">🔥 Imune a fogo</span>':''}${p.skills.concat(p.traits).map(x=>`<span class="trait">${x}</span>`).join('')}</div>
+  ${p.notes.map(n=>`<p class="note">${n}</p>`).join('')}
+ </div></article>`;
+}
+function renderCompanheiros(){
+ return `<div class="ph"><h2>🐕 Companheiros</h2><p>Ligar um buff aqui só marca o estado e recalcula os números destacados; o PM da Cael não é descontado. Tudo fica salvo e o descanso longo restaura PV, zera buffs e recarrega a baforada.</p></div>
+ <div class="dbar"><button class="btn primary" onclick="openForm('pets')">+ Adicionar companheiro</button><span class="side-hint">Familiar novo, montaria, invocação ou outro animal.</span></div>
+ <div class="pets">${petCard('brasa')}${petCard('fam')}${S.extraPets.map(extraCard).join('')}</div>`;
+}
+function adjPet(k,d){ const mx=LIMITS[k+'Max']; S[k]= d===Infinity?mx:Math.max(0,Math.min(mx,S[k]+d)); const v=document.getElementById('v-'+k); if(v) v.textContent=S[k]; const b=document.getElementById('b-'+k); if(b) b.style.width=(S[k]/mx*100)+'%'; save(); }
+function petBuff(k,id){ const b=S.pets[k].buffs; b[id]=!b[id]; if(id==='veloc'&&b[id]) dissipaLento(k); save(); renderContent(); }
+function petForma(f){ S.pets.brasa.forma=f; save(); renderContent(); }
+function petBaforada(){ const p=S.pets.brasa; p.baforada=!p.baforada; save(); renderContent(); if(p.baforada) toast('🔥 Baforada de Fogo usada. Recarrega no descanso longo.'); }
+const ITEMS=[
+ {sec:'Armas',ico:'🏹',name:'Arco Longo Magistral Brutal Equilibrado ★',type:'Arco · Magistral · Brutal · Equilibrado',kv:[['Ataque','+8 (BBA + DES + tamanho Mínimo + Equilibrado)'],['Dano','1d12 (Brutal aumenta o dado)'],['Alcance','30m']],obs:'Com Flecha de Chamas: +1d6+3 de fogo por flecha. Com Velocidade: 2 ataques por ação completa.',roll:['1d12','Arco · dano']},
+ {sec:'Armas',ico:'🪽',name:'Asas de Aço (talento) · 4 asas',type:'Arma natural · Escudo · 2 pares de asas',kv:[['Proteção','+1 CA por asa · +4 com as 4 asas (já incluso na CA 23)'],['Ataque','1d4 − 1 por asa (FOR −1)']],obs:'Não pode proteger e atacar com a mesma asa: cada asa usada para atacar tira 1 da CA naquela rodada. Não funciona durante o voo. Todas são mãos inábeis.'},
+ {sec:'Itens mágicos',ico:'🎩',name:'Chapéu do Disfarce ★',type:'Cabeça',kv:[['Valor','1.800 TO']],obs:'Altera a aparência do portador. +10 em Enganação com Alterar-se ativa.'},
+ {sec:'Consumíveis',ico:'🧪',name:'Bálsamo Restaurador ×4',type:'Cura sem PM',kv:[['Cura','2d4 PV']],roll:['2d4','Bálsamo Restaurador']},
+ {sec:'Consumíveis',ico:'💊',name:'Poção de Curar Ferimentos Leves ×5',type:'Cura · ação padrão',kv:[['Cura','1d8+1 PV']],roll:['1d8+1','Poção de cura']},
+ {sec:'Equipamento',ico:'🎒',name:'Kit de Aventureiro ×2',type:'Kit',kv:[['Conteúdo','Mochila, corda, pederneira, tochas, odre, ração, traje']]},
+ {sec:'Equipamento',ico:'🪙',name:'Algibeira ×2 · Rações ×14 · Flechas',type:'Diversos',kv:[['Flechas padrão','×40'],['Flechas metálicas','×40']]},
+];
+const SKILLS=[['🐾','Adestrar Animais','Car',14],['🌱','Conhecimento: Fadas','Int',12],['💬','Diplomacia','Car',14],['🎭','Enganação','Car · +10 com disfarce',14],['🙈','Furtividade','Des · +8 racial Sprite',21],['✨','Identificar Magia','Int',12],['⚡','Iniciativa','Des · −4 Desligado',9],['👀','Percepção','Sab',8],['🌿','Sobrevivência','Sab',12]];
+function renderItens(){
+ const secs=[...new Set(ITEMS.map(i=>i.sec))];
+ return `<div class="ph"><h2>🎒 Itens e perícias</h2><p>Atenção: o ataque com arco aparece como +10 na barra de combate e +8 aqui. Um dos dois está desatualizado na ficha.</p></div>
+ <div class="panels">
+ <article class="panel"><div class="panel-h"><h3>📋 Perícias treinadas</h3></div><div class="panel-b">
+  <dl class="kv"><dt>Corpo a corpo</dt><dd><strong>+3</strong> (BBA 2 · FOR −1 · tamanho +2)</dd><dt>À distância</dt><dd><strong>+8</strong> (BBA 2 · DES +4 · tamanho +2)</dd></dl>
+  <div class="skill-list">${SKILLS.map(([i,n,a,v])=>`<div>${i} ${n}<small>${a}</small></div><div class="sv">+${v}</div>`).join('')}</div>
+ </div></article>
+ ${secs.map(sec=>ITEMS.filter(i=>i.sec===sec).map(it=>`<article class="panel"><div class="panel-h"><h3>${it.ico} ${it.name}</h3><span class="chip">${sec}</span></div><div class="panel-b">
+  <div class="note" style="margin:0 0 .3rem">${it.type}</div>
+  <dl class="kv">${it.kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+  ${it.obs?`<p>${it.obs}</p>`:''}${it.roll?`<button class="btn sm" style="margin-top:.5rem" onclick="rollFormula('${it.roll[0]}','${it.roll[1]}')">🎲 Rolar ${it.roll[0]}</button>`:''}
+ </div></article>`).join('')).join('')}
+ </div>`;
+}
+
+// ═══ DIÁRIO DA CAMPANHA ═══
+function normDiario(d){
+ d=d&&typeof d==='object'?d:{};
+ const arr=k=>Array.isArray(d[k])?d[k].filter(x=>x&&x.id):[];
+ return {sessoes:arr('sessoes'),npcs:arr('npcs'),lugares:arr('lugares'),missoes:arr('missoes'),ganchos:arr('ganchos'),
+  to:Number(d.to)||0,xp:Number(d.xp)||0,toLog:Array.isArray(d.toLog)?d.toLog:[]};
+}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const hoje=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+const dataBR=s=>s&&/^\d{4}-\d{2}-\d{2}$/.test(s)?s.split('-').reverse().join('/'):(s||'sem data');
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const KINDS={
+ sessoes:{one:'Sessão',ico:'📖',tab:'Sessões',fields:[['data','Data','date'],['titulo','Título da sessão','text'],['resumo','O que aconteceu','textarea','tall'],['recompensas','Recompensas, XP, itens e tesouro','textarea']]},
+ npcs:{one:'NPC',ico:'🧑',tab:'NPCs',fields:[['nome','Nome','text'],['papel','Quem é / ocupação','text'],['local','Onde encontrar','text'],['atitude','Atitude com o grupo','select',['Aliado','Amigável','Neutro','Desconfiado','Hostil','Desconhecida']],['status','Situação','select',['Vivo','Morto','Desaparecido','Desconhecida']],['notas','Notas, segredos, o que prometeu','textarea']]},
+ lugares:{one:'Lugar',ico:'🗺',tab:'Lugares',fields:[['nome','Nome','text'],['regiao','Região ou reino','text'],['visitado','Situação','select',['Visitado','Ouvimos falar','Próximo destino']],['notas','Descrição, quem vive lá, o que tem','textarea']]},
+ missoes:{one:'Missão',ico:'📜',tab:'Missões',fields:[['titulo','Missão','text'],['contratante','Quem pediu','text'],['status','Status','select',['Ativa','Concluída','Falhou','Abandonada']],['recompensa','Recompensa prometida','text'],['notas','Objetivos e andamento','textarea']]},
+ ganchos:{one:'Pista ou mistério',ico:'❓',tab:'Pistas',fields:[['texto','Pista, rumor ou pergunta em aberto','textarea'],['status','Situação','select',['Em aberto','Resolvido']],['origem','Onde surgiu (sessão, NPC, lugar)','text']]},
+ pets:{one:'Companheiro',ico:'🐾',fields:[['nome','Nome','text'],['tipo','Tipo','select',['Familiar','Companheiro animal','Montaria','Invocação','Outro']],['especie','Espécie e tamanho','text'],
+  ['pvMax','PV máximos','number'],['ca','CA','number'],['desl','Deslocamento (m)','number'],['fort','Fortitude','number'],['ref','Reflexos','number'],['von','Vontade','number'],
+  ['ataque','Ataque principal','text'],['atk','Bônus de ataque','number'],['dano','Dano (ex.: 1d6+2)','text'],['notas','Habilidades, talentos e notas','textarea']]},
+};
+const DCHIP={Aliado:'good',Amigável:'good',Neutro:'',Desconfiado:'warn',Hostil:'bad',Desconhecida:'',Vivo:'',Morto:'bad',Desaparecido:'warn',
+ Visitado:'good','Ouvimos falar':'',['Próximo destino']:'info',Ativa:'info',Concluída:'good',Falhou:'bad',Abandonada:'','Em aberto':'warn',Resolvido:'good'};
+let DQ='';
+function getList(kind){ return kind==='pets'?S.extraPets:S.diario[kind]; }
+function sessaoNum(id){ const asc=[...S.diario.sessoes].sort((a,b)=>(a.data||'').localeCompare(b.data||'')||a.criado-b.criado); return asc.findIndex(x=>x.id===id)+1; }
+function sortedList(kind){
+ const L=[...S.diario[kind]];
+ if(kind==='sessoes') return L.sort((a,b)=>(b.data||'').localeCompare(a.data||'')||b.criado-a.criado);
+ if(kind==='missoes'){ const o={Ativa:0,Concluída:1,Falhou:2,Abandonada:3}; return L.sort((a,b)=>(o[a.status]??9)-(o[b.status]??9)||(a.titulo||'').localeCompare(b.titulo||'')); }
+ if(kind==='ganchos') return L.sort((a,b)=>(a.status==='Resolvido')-(b.status==='Resolvido')||b.criado-a.criado);
+ return L.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+}
+function itemTitle(kind,x){ return x.titulo||x.nome||(x.texto?String(x.texto).split('\n')[0].slice(0,70):'')||'(sem título)'; }
+function ditem(kind,x){
+ const K=KINDS[kind]; const chips=[]; let meta='', body='', extra='';
+ const ch=v=>v?`<span class="chip ${DCHIP[v]||''}">${esc(v)}</span>`:'';
+ if(kind==='sessoes'){ meta=`Sessão ${sessaoNum(x.id)} · ${dataBR(x.data)}`; body=x.resumo; if(x.recompensas) extra=`<div class="lbl">Recompensas</div><div class="txt">${esc(x.recompensas)}</div>`; }
+ if(kind==='npcs'){ chips.push(ch(x.atitude),ch(x.status)); meta=[x.papel,x.local&&'📍 '+x.local].filter(Boolean).map(esc).join(' · '); body=x.notas; }
+ if(kind==='lugares'){ chips.push(ch(x.visitado)); meta=esc(x.regiao||''); body=x.notas; }
+ if(kind==='missoes'){ chips.push(ch(x.status)); meta=[x.contratante&&'Pedida por '+x.contratante,x.recompensa&&'💰 '+x.recompensa].filter(Boolean).map(esc).join(' · '); body=x.notas; }
+ if(kind==='ganchos'){ chips.push(ch(x.status)); meta=x.origem?'Surgiu em: '+esc(x.origem):''; body=x.texto&&x.texto.includes('\n')?x.texto.split('\n').slice(1).join('\n'):''; }
+ const done=(kind==='ganchos'&&x.status==='Resolvido')||(kind==='missoes'&&['Concluída','Falhou','Abandonada'].includes(x.status));
+ const quick = kind==='ganchos' ? `<button class="btn sm" onclick="toggleGancho('${x.id}')">${x.status==='Resolvido'?'Reabrir':'✓ Resolvido'}</button>` : '';
+ return `<article class="panel ditem${done?' done':''}"><div class="panel-h"><h3>${K.ico} ${esc(itemTitle(kind,x))}</h3>${chips.join('')}</div><div class="panel-b">
+  ${meta?`<div class="meta">${meta}</div>`:''}${body?`<div class="txt${kind==='sessoes'?' clip':''}">${esc(body)}</div>`:''}${extra}
+  <div class="mini-form">${quick}<button class="btn sm" onclick="openForm('${kind}','${x.id}')">✎ ${kind==='sessoes'?'Ler e editar':'Editar'}</button></div></div></article>`;
+}
+function renderDiario(){
+ const el=document.getElementById('content'); const D=S.diario; const k=S.dtab; const K=KINDS[k];
+ const last=sortedList('sessoes')[0];
+ el.innerHTML=`<div class="ph"><h2>📓 Diário da campanha</h2><p>Sessões, NPCs, lugares, missões e pistas. Tudo fica salvo no navegador; use o backup para não perder nada ao trocar de computador.</p></div>
+ <div class="dhead">
+  <button class="btn" onclick="exportBackup()">💾 Exportar backup</button>
+  <button class="btn" onclick="document.getElementById('imp-file').click()">📂 Importar backup</button>
+  <input type="file" id="imp-file" accept=".json,application/json" hidden onchange="importBackup(this)">
+  <button class="btn" onclick="exportDiarioTxt()">📄 Diário em texto</button>
+ </div>
+ <div class="dtop">
+  <article class="panel recap"><div class="panel-h"><h3>⏪ Da última vez…</h3>${last?`<span class="chip">Sessão ${sessaoNum(last.id)} · ${dataBR(last.data)}</span>`:''}</div>
+   <div class="panel-b">${last?`<strong>${esc(last.titulo||'')}</strong>${last.titulo?'\n':''}${esc((last.resumo||'').slice(0,700))}${(last.resumo||'').length>700?'…':''}`:'<span class="side-hint">Nenhuma sessão registrada ainda. Anote a primeira no fim do jogo de hoje.</span>'}</div></article>
+  <article class="panel"><div class="panel-h"><h3>💰 Tesouro e XP</h3></div><div class="panel-b">
+   <div class="counter"><b>${D.to.toLocaleString('pt-BR')}</b><span>TO</span></div>
+   <div class="mini-form"><input type="number" id="to-v" placeholder="valor" min="0"><input type="text" id="to-m" placeholder="motivo (opcional)">
+    <button class="btn sm" onclick="moveTO(1)">+ Ganhar</button><button class="btn sm" onclick="moveTO(-1)">− Gastar</button></div>
+   ${D.toLog.length?`<ul class="txlog">${D.toLog.slice(0,5).map(l=>`<li><span>${dataBR(l.d)} · ${esc(l.m||'—')}</span><span class="${l.v>0?'pos':'neg'}">${l.v>0?'+':'−'}${Math.abs(l.v).toLocaleString('pt-BR')}</span></li>`).join('')}</ul>`:''}
+   <div class="counter xp" style="margin-top:.9rem"><b>${D.xp.toLocaleString('pt-BR')}</b><span>XP</span></div>
+   <div class="mini-form"><input type="number" id="xp-v" placeholder="XP ganho"><button class="btn sm" onclick="addXP()">+ Somar</button></div>
+  </div></article>
+ </div>
+ <div class="dbar">
+  <div class="seg" role="tablist">${Object.entries(KINDS).filter(([id])=>id!=='pets').map(([id,K2])=>`<button aria-pressed="${k===id}" onclick="setDtab('${id}')">${K2.ico} ${K2.tab} (${D[id].length})</button>`).join('')}</div>
+ </div>
+ <div class="dbar"><input class="dsearch" id="dsearch" type="search" placeholder="Buscar em ${K.tab.toLowerCase()}…" value="${esc(DQ)}" oninput="DQ=this.value;renderDList()"><button class="btn primary" onclick="openForm('${k}')">+ ${({sessoes:'Nova sessão',npcs:'Novo NPC',lugares:'Novo lugar',missoes:'Nova missão',ganchos:'Nova pista'})[k]}</button></div>
+ <div id="dlist"></div>`;
+ renderDList();
+}
+function renderDList(){
+ const k=S.dtab, q=norm(DQ).trim();
+ const L=sortedList(k).filter(x=>!q||norm(Object.values(x).join(' ')).includes(q));
+ document.getElementById('dlist').innerHTML = L.length ? `<div class="panels">${L.map(x=>ditem(k,x)).join('')}</div>`
+  : `<div class="empty">${q?'Nada encontrado para essa busca.':'Nada registrado aqui ainda.'}</div>`;
+}
+function setDtab(k){ S.dtab=k; DQ=''; save(); renderDiario(); }
+function toggleGancho(id){ const g=S.diario.ganchos.find(x=>x.id===id); if(!g) return; g.status=g.status==='Resolvido'?'Em aberto':'Resolvido'; save(); renderDList(); }
+function moveTO(sign){
+ const v=Math.abs(parseInt(document.getElementById('to-v').value,10)); if(!v){ toast('Informe um valor.'); return; }
+ const m=document.getElementById('to-m').value.trim();
+ S.diario.to+=sign*v; S.diario.toLog.unshift({d:hoje(),v:sign*v,m}); S.diario.toLog=S.diario.toLog.slice(0,200);
+ save(); renderDiario();
+}
+function addXP(){ const v=parseInt(document.getElementById('xp-v').value,10); if(!v){ toast('Informe o XP.'); return; } S.diario.xp+=v; save(); renderDiario(); }
+
+// ── formulário genérico (diário e companheiros) ──
+let F=null;
+function openForm(kind,id){
+ const K=KINDS[kind], it=id?getList(kind).find(x=>x.id===id):null; F={kind,id};
+ const val=(f)=>it?it[f[0]]:(f[0]==='data'?hoje():f[2]==='select'?f[3][0]:'');
+ const field=f=>{const [name,label,type,opt]=f; const v=val(f); const wide=type==='textarea'||name==='titulo'||name==='nome'?' wide':'';
+  let input;
+  if(type==='textarea') input=`<textarea name="${name}" id="f-${name}" class="${opt==='tall'?'tall':''}">${esc(v)}</textarea>`;
+  else if(type==='select') input=`<select name="${name}" id="f-${name}">${opt.map(o=>`<option${o===v?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  else input=`<input name="${name}" id="f-${name}" type="${type}" value="${esc(v)}"${type==='number'?' step="1"':''}>`;
+  return `<div class="field${wide}"><label for="f-${name}">${label}</label>${input}</div>`;};
+ const box=document.getElementById('mdl-box'); box.style.setProperty('--sc','var(--accent)');
+ box.innerHTML=`<header class="mh"><div class="mh-ico">${K.ico}</div><div class="mh-txt"><div class="mh-eyebrow">${kind==='pets'?'Companheiros':'Diário'}</div><h2 id="mdl-title">${it?'Editar':'Novo registro'} · ${K.one}</h2></div><div class="mh-nav"><button class="btn sm x" type="button" onclick="closeModal()" aria-label="Fechar">✕</button></div></header>
+  <form id="dform" onsubmit="saveForm();return false" style="display:contents">
+   <div class="mb"><div class="fgrid">${K.fields.map(field).join('')}</div></div>
+   <footer class="mf">${it?'<button type="button" class="btn danger" onclick="delItem()">🗑 Excluir</button>':''}<button type="button" class="btn" onclick="closeModal()">Cancelar</button><button type="submit" class="btn primary">Salvar</button></footer>
+  </form>`;
+ document.getElementById('mdl').hidden=false; document.body.classList.add('locked');
+ setTimeout(()=>document.querySelector('#dform input,#dform textarea')?.focus(),30);
+}
+function saveForm(){
+ const K=KINDS[F.kind], list=getList(F.kind), fd=new FormData(document.getElementById('dform')); const o={};
+ K.fields.forEach(([name,,type])=>{ const v=fd.get(name); o[name]= type==='number' ? (v===''||v===null?null:parseInt(v,10)) : String(v??'').trim(); });
+ const first=K.fields.find(f=>f[2]!=='date'&&f[2]!=='select')[0];
+ if(!o[first]){ toast('Preencha o campo “'+K.fields.find(f=>f[0]===first)[1]+'”.'); document.getElementById('f-'+first)?.focus(); return; }
+ if(F.kind==='pets'){ o.pvMax=Math.max(1,o.pvMax||1); }
+ if(F.id){ const it=list.find(x=>x.id===F.id); Object.assign(it,o); if(F.kind==='pets') it.pv=Math.min(it.pv??o.pvMax,o.pvMax); }
+ else { const n=Object.assign({id:uid(),criado:Date.now()},o); if(F.kind==='pets'){ n.pv=n.pvMax; n.buffs={}; } list.push(n); }
+ const label=K.one; save(); closeModal(); renderContent(); toast(`${label} salvo.`);
+}
+function delItem(){
+ const list=getList(F.kind), i=list.findIndex(x=>x.id===F.id); if(i<0) return;
+ if(!confirm(`Excluir “${itemTitle(F.kind,list[i])}”? Não dá para desfazer (a não ser por um backup).`)) return;
+ list.splice(i,1); save(); closeModal(); renderContent(); toast('Excluído.');
+}
+
+// ── companheiros adicionados ──
+function extraCard(x){
+ const b=x.buffs||{}, v=b.veloc?2:0, num=n=>typeof n==='number'&&!isNaN(n);
+ const ca=num(x.ca)?x.ca+(b.armac?4:0)+v:null, atk=num(x.atk)?x.atk+v:null, ref=num(x.ref)?x.ref+v:null, desl=num(x.desl)?x.desl+(v?9:0):null;
+ const tile=(l,val,boost)=>val==null?'':`<div class="tile${boost?' boost':''}"><dt>${l}</dt><dd>${val}</dd></div>`;
+ const dmgOk=/^\d+d\d+([+-]\d+)?$/i.test(x.dano||'');
+ return `<article class="panel pet"><div class="panel-h"><h3>🐾 ${esc(x.nome)}</h3><button class="btn sm" onclick="openForm('pets','${x.id}')">✎ Editar</button><span class="pet-sub">${esc([x.tipo,x.especie].filter(Boolean).join(' · '))}</span></div><div class="panel-b">
+  <div class="pet-pv"><span class="lbl">PV</span><b>${x.pv}</b><span class="rc-max">/ ${x.pvMax}</span><span style="flex:1"></span>
+   <button class="btn sm" onclick="adjExtra('${x.id}',-5)">−5</button><button class="btn sm" onclick="adjExtra('${x.id}',-1)">−1</button><button class="btn sm" onclick="adjExtra('${x.id}',1)">+1</button><button class="btn sm" onclick="adjExtra('${x.id}',5)">+5</button><button class="btn sm" onclick="adjExtra('${x.id}',Infinity)">Máx</button>
+   <div class="bar" style="--c:var(--pv)"><i style="width:${x.pv/x.pvMax*100}%"></i></div></div>
+  <dl class="tiles">${tile('CA',ca,ca!==x.ca)}${tile('Ataque',atk==null?null:sg(atk),v)}${tile('Fortitude',num(x.fort)?sg(x.fort):null)}${tile('Reflexos',ref==null?null:sg(ref),v)}${tile('Vontade',num(x.von)?sg(x.von):null)}${tile('Desloc.',desl==null?null:fmtM(desl),v)}</dl>
+  ${x.ataque||atk!=null?`<h4>Ataque</h4><div class="atk"><span class="atk-n">${esc(x.ataque||'Ataque')}${atk!=null?' '+sg(atk):''}${x.dano?' · dano '+esc(x.dano):''}${v?'<small>Velocidade +2</small>':''}</span>
+   ${atk!=null?`<button class="btn sm" onclick="rollFormula('1d20${sg(atk).replace('−','-')}','${esc(x.nome).replace(/'/g,'')} · ataque')">🎲 Ataque</button>`:''}${dmgOk?`<button class="btn sm" onclick="rollFormula('${x.dano.toLowerCase()}','${esc(x.nome).replace(/'/g,'')} · dano')">🎲 Dano</button>`:''}</div>`:''}
+  <h4>Buffs da Cael</h4>
+  ${PET_BUFFS.filter(p=>p.id!=='sant').map(p=>`<button class="buff" role="switch" aria-checked="${!!b[p.id]}" onclick="extraBuff('${x.id}','${p.id}')"><span class="sw"></span><span class="buff-t"><span class="buff-n">${p.name}</span><span class="buff-v">${p.val}</span></span><span class="buff-pm">${p.pm}</span></button>`).join('')}
+  ${x.notas?`<h4>Notas</h4><p class="txt" style="white-space:pre-wrap">${esc(x.notas)}</p>`:''}
+ </div></article>`;
+}
+function adjExtra(id,d){ const x=S.extraPets.find(p=>p.id===id); if(!x) return; x.pv= d===Infinity?x.pvMax:Math.max(0,Math.min(x.pvMax,x.pv+d)); save(); renderContent(); }
+function extraBuff(id,b){ const x=S.extraPets.find(p=>p.id===id); if(!x) return; x.buffs=x.buffs||{}; x.buffs[b]=!x.buffs[b]; save(); renderContent(); }
+
+// ── backup e exportação ──
+function baixar(nome,conteudo,tipo){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([conteudo],{type:tipo})); a.download=nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+function exportBackup(){
+ baixar(`cael_backup_${hoje()}.json`, JSON.stringify({app:'grimorio-cael',versao:1,exportado:new Date().toISOString(),estado:S},null,1),'application/json');
+ toast('💾 Backup baixado. Guarde o arquivo junto com o grimório.');
+}
+function importBackup(inp){
+ const f=inp.files&&inp.files[0]; inp.value=''; if(!f) return;
+ const r=new FileReader();
+ r.onload=()=>{
+  let o; try{ o=JSON.parse(r.result); }catch(e){ toast('⚠ Arquivo inválido: não é um JSON.'); return; }
+  const est=o&&o.estado?o.estado:o;
+  if(!est||typeof est!=='object'||!('pv' in est)||!('pma' in est)){ toast('⚠ Esse arquivo não parece um backup do grimório.'); return; }
+  const n=est.diario?['sessoes','npcs','missoes'].map(k=>(est.diario[k]||[]).length):[0,0,0];
+  if(!confirm(`Importar backup${o.exportado?' de '+new Date(o.exportado).toLocaleString('pt-BR'):''}?\n${n[0]} sessões · ${n[1]} NPCs · ${n[2]} missões\n\nIsso SUBSTITUI todo o estado atual (PV, PM, diário, companheiros).`)) return;
+  try{ localStorage.setItem(KEY,JSON.stringify(est)); }catch(e){ toast('⚠ O navegador bloqueou o salvamento.'); return; }
+  location.reload();
+ };
+ r.readAsText(f);
+}
+function exportDiarioTxt(){
+ const D=S.diario, L=[], line=s=>L.push(s), sec=s=>{line('');line('══ '+s+' ══');};
+ line('DIÁRIO DE CAMPANHA — CAEL'); line('Exportado em '+dataBR(hoje()));
+ sec('SESSÕES'); [...D.sessoes].sort((a,b)=>(a.data||'').localeCompare(b.data||'')||a.criado-b.criado).forEach(s=>{line('');line(`Sessão ${sessaoNum(s.id)} · ${dataBR(s.data)}${s.titulo?' — '+s.titulo:''}`);if(s.resumo)line(s.resumo);if(s.recompensas)line('Recompensas: '+s.recompensas);});
+ sec('MISSÕES'); sortedList('missoes').forEach(m=>line(`• [${m.status}] ${m.titulo}${m.contratante?' (pedida por '+m.contratante+')':''}${m.recompensa?' — recompensa: '+m.recompensa:''}${m.notas?'\n  '+m.notas.replace(/\n/g,'\n  '):''}`));
+ sec('PISTAS E MISTÉRIOS'); sortedList('ganchos').forEach(g=>line(`• [${g.status}] ${g.texto.replace(/\n/g,' ')}${g.origem?' (surgiu em: '+g.origem+')':''}`));
+ sec('NPCS'); sortedList('npcs').forEach(n=>line(`• ${n.nome}${n.papel?' — '+n.papel:''} [${n.atitude}, ${n.status}]${n.local?' · '+n.local:''}${n.notas?'\n  '+n.notas.replace(/\n/g,'\n  '):''}`));
+ sec('LUGARES'); sortedList('lugares').forEach(l=>line(`• ${l.nome}${l.regiao?' ('+l.regiao+')':''} [${l.visitado}]${l.notas?'\n  '+l.notas.replace(/\n/g,'\n  '):''}`));
+ sec('TESOURO E XP'); line(`${D.to} TO · ${D.xp} XP`);
+ baixar(`cael_diario_${hoje()}.txt`, L.join('\n'), 'text/plain;charset=utf-8');
+}
+
+// ═══ TEMA, BARRA LATERAL, NOTIFICAÇÃO ═══
+function setTheme(t){
+ S.theme=t; document.documentElement.setAttribute('data-theme',t);
+ document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===t));
+ if(window.fxSys) window.fxSys.reset(); save();
+}
+function toggleSide(open){
+ document.getElementById('side').classList.toggle('open',open);
+ document.getElementById('scrim').hidden=!open;
+}
+let toastT;
+function toast(html,ms=2800){ const t=document.getElementById('toast'); t.innerHTML=html; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),ms); }
+const showAlert=toast;
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){ if(CP) closeCondPop(); else if(!document.getElementById('mdl').hidden) closeModal(); else toggleSide(false); }
+ if(M && e.target.tagName!=='INPUT'){ if(e.key==='ArrowRight') navSpell(1); if(e.key==='ArrowLeft') navSpell(-1); }
+});
+
+// ═══ PARTÍCULAS (sutis, só nos temas escuros) ═══
+class FX{
+ constructor(c){this.c=c;this.x=c.getContext('2d');this.p=[];addEventListener('resize',()=>this.size());this.size();this.reset();this.loop=this.loop.bind(this);requestAnimationFrame(this.loop);}
+ size(){this.c.width=innerWidth;this.c.height=innerHeight;}
+ reset(){this.p=[];for(let i=0;i<28;i++){const q=this.mk();q.life=Math.random()*q.max;this.p.push(q);}}
+ mk(){const fire=S.theme==='chamas';return{x:Math.random()*this.c.width,y:fire?this.c.height+5:Math.random()*this.c.height,r:Math.random()*1.8+.6,vx:(Math.random()-.5)*.3,vy:fire?-(Math.random()*.6+.2):(Math.random()-.5)*.2,life:0,max:2+Math.random()*2,h:fire?25+Math.random()*20:270+Math.random()*50};}
+ loop(){requestAnimationFrame(this.loop);if(S.theme==='pergaminho')return;const x=this.x;x.clearRect(0,0,this.c.width,this.c.height);
+  this.p.forEach((q,i)=>{q.x+=q.vx;q.y+=q.vy;q.life+=.006;if(q.life>=q.max||q.y<-10){this.p[i]=this.mk();return;}const a=Math.sin(q.life/q.max*Math.PI)*.7;x.fillStyle=`hsla(${q.h},90%,72%,${a})`;x.beginPath();x.arc(q.x,q.y,q.r,0,7);x.fill();});}
+}
+
+// ═══ EXPORTAR ═══
+function exportarMagias() {
+  const schoolNames = {
+    fogo:'🔥 Fogo', def:'🛡 Defesa', ilusao:'🎭 Ilusão',
+    natureza:'🌿 Natureza', util:'🔧 Utilidade', sprite:'✨ Sprite'
+  };
+  const schoolOrder = ['fogo','def','ilusao','natureza','util','sprite'];
+
+  let html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+<title>Magias de Cael — Grimório</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=IM+Fell+English&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#1a1020;color:#e8ddf5;font-family:'IM Fell English',Georgia,serif;padding:2rem;max-width:900px;margin:0 auto}
+  h1{font-family:'Cinzel',serif;font-size:2rem;color:#c084f5;text-align:center;margin-bottom:.3rem;letter-spacing:.1em}
+  .subtitulo{text-align:center;font-size:.9rem;color:#9070b0;margin-bottom:2.5rem;font-style:italic}
+  .escola{margin-bottom:2.5rem;page-break-inside:avoid}
+  .escola-titulo{font-family:'Cinzel',serif;font-size:1.2rem;color:#e9c46a;border-bottom:2px solid #4a2060;padding-bottom:.4rem;margin-bottom:1rem;letter-spacing:.08em}
+  .magia{background:#1e1030;border:1px solid #3a1f55;border-radius:6px;padding:1rem 1.2rem;margin-bottom:.8rem;page-break-inside:avoid}
+  .magia-head{display:flex;align-items:baseline;gap:.8rem;margin-bottom:.5rem;flex-wrap:wrap}
+  .magia-nome{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;color:#d8b4fe}
+  .magia-nivel{font-size:.75rem;color:#9070b0;border:1px solid #4a2060;border-radius:3px;padding:.1rem .4rem}
+  .magia-pm{font-size:.78rem;color:#f0a500;font-weight:bold}
+  .magia-meta{display:flex;gap:1.5rem;font-size:.78rem;color:#7a608a;margin-bottom:.6rem;flex-wrap:wrap}
+  .magia-meta span strong{color:#b09ac0}
+  .magia-desc{font-size:.88rem;color:#c8b8e0;line-height:1.6;margin-bottom:.5rem}
+  .magia-cael{font-size:.82rem;color:#a0f0c0;background:#0a1a10;border-left:3px solid #30a060;padding:.5rem .75rem;border-radius:0 4px 4px 0;line-height:1.5}
+  .magia-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+  .tag{font-size:.65rem;background:#2a1040;color:#9070b0;border:1px solid #3a1f55;border-radius:3px;padding:.1rem .45rem}
+  .footer-exp{text-align:center;margin-top:3rem;font-size:.75rem;color:#5a4070;font-style:italic}
+  @media print{body{background:white;color:#111}.magia{border-color:#ccc;background:#faf5ff}.magia-cael{background:#f0fff0;color:#1a4a1a}}
+</style></head><body>
+<h1>✦ Grimório de Cael ✦</h1>
+<div class="subtitulo">Sprite · Druida Ermitã / Mago Evocador · Devota de Wynna</div>`;
+
+  for (const school of schoolOrder) {
+    const spells = SPELL_DB.filter(s => s.school === school && !s.off);
+    if (!spells.length) continue;
+    html += `<div class="escola"><div class="escola-titulo">${schoolNames[school]}</div>`;
+    for (const s of spells) {
+      const pmLabel = s.arcana ? `${s.pm} PM` : `${s.pm} PM Divino`;
+      html += `<div class="magia">
+  <div class="magia-head">
+    <span class="magia-nome">${s.name}</span>
+    <span class="magia-nivel">${s.nivel}</span>
+    <span class="magia-pm">${pmLabel}</span>
+  </div>
+  <div class="magia-meta">
+    <span><strong>Execução:</strong> ${s.exec}</span>
+    <span><strong>Alcance:</strong> ${s.alc}</span>
+    <span><strong>Alvo:</strong> ${s.alvo}</span>
+    <span><strong>Duração:</strong> ${s.dur}</span>
+    ${s.tr !== 'Nenhum' ? `<span><strong>Resistência:</strong> ${s.tr} ${s.cd !== '—' ? '('+s.cd+')':''}</span>` : ''}
+  </div>
+  ${s.lvl ? `<div class="magia-meta"><span><strong>Nível:</strong> ${s.lvl}</span></div>` : ''}
+  <div class="magia-desc">${s.desc}</div>
+  <div class="magia-cael">💡 <strong>Cael:</strong> ${s.cael}</div>
+  <div class="magia-tags">${(s.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+</div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `<div class="footer-exp">Gerado a partir do Grimório Interativo de Cael · Tormenta RPG</div></body></html>`;
+
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cael_magias.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showAlert('📄 Magias exportadas! Abra o arquivo para imprimir ou salvar.', 2500);
+}
+
+// ═══ INÍCIO ═══
+document.addEventListener('DOMContentLoaded',()=>{
+ setTheme(S.theme);
+ buildRes(); buildTabs(); update(); renderContent();
+ const el=document.getElementById('save-flag'); el.textContent='💾 Estado salvo neste navegador';
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches){ try{ window.fxSys=new FX(document.getElementById('fx')); }catch(e){} }
+});
+</script>
+</body>
+</html>
